@@ -8,6 +8,9 @@ interface StatCounterProps {
   prefix?: string;
   label: string;
   duration?: number;
+  className?: string;
+  /** Use light text colors (for dark backgrounds) */
+  dark?: boolean;
 }
 
 function formatValue(value: number): string {
@@ -25,6 +28,8 @@ export function StatCounter({
   prefix = "",
   label,
   duration = 1.8,
+  className = "",
+  dark = false,
 }: StatCounterProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [value, setValue] = useState(0);
@@ -82,14 +87,19 @@ export function StatCounter({
   );
 
   return (
-    <div
-      ref={ref}
-      className="rounded-3xl border border-gold/20 bg-pure-white/70 px-6 py-8 text-center shadow-[0_20px_50px_-40px_rgba(201,169,110,0.5)] backdrop-blur"
-    >
-      <div className="text-4xl font-bold tracking-tight text-charcoal md:text-5xl">
+    <div ref={ref} className={`text-center ${className}`.trim()}>
+      <div
+        className={`text-4xl font-bold tracking-tight md:text-5xl ${
+          dark ? "text-gold" : "text-charcoal"
+        }`}
+      >
         {displayValue}
       </div>
-      <p className="mt-3 text-sm font-medium uppercase tracking-[0.2em] text-text-muted">
+      <p
+        className={`mt-3 text-sm font-medium uppercase tracking-[0.2em] ${
+          dark ? "text-silver-light/50" : "text-text-muted"
+        }`}
+      >
         {label}
       </p>
     </div>

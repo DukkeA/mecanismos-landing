@@ -1,59 +1,134 @@
 "use client";
 
 import { useRef } from "react";
-import { DURATION, EASE, SCROLL_DEFAULTS, prefersReducedMotion } from "@/lib/animations";
+import { GearSVG } from "@/components/svg/GearSVG";
+import { prefersReducedMotion } from "@/lib/animations";
 import { gsap, ScrollTrigger, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
-
-interface StorySectionProps {
-  id?: string;
-}
-
-const storyBeats = [
-  {
-    title: "Nuestra Historia",
-    description:
-      "Desde 1999, Mecanismos Técnicos ha sido referente en el diagnóstico y reparación de sistemas diésel en Bogotá. Lo que comenzó como un pequeño taller se ha convertido en un centro de servicio especializado.",
-    label: "Foto del taller",
-  },
-  {
-    title: "Experiencia que Respalda",
-    description:
-      "Más de dos décadas perfeccionando cada procedimiento. Nuestro equipo combina conocimiento técnico profundo con las herramientas más avanzadas del mercado.",
-    label: "Equipo de trabajo",
-  },
-  {
-    title: "Compromiso con la Excelencia",
-    description:
-      "Cada motor que entra a nuestro taller recibe el mismo nivel de atención al detalle. No hacemos reparaciones a medias: hacemos las cosas bien.",
-    label: "Zona de diagnóstico",
-  },
-] as const;
 
 registerGSAPPlugins();
 
-export function StorySection({ id = "historia" }: StorySectionProps) {
+const epochs = [
+  {
+    year: "1999",
+    title: "El Inicio",
+    description:
+      "Un pequeño taller en el corazón de Bogotá. Con herramientas básicas y una pasión inagotable por los motores diésel, nació Mecanismos Técnicos.",
+    accent: "from-gold-dark/30 to-charcoal/90",
+    label: "Foto del primer taller",
+  },
+  {
+    year: "2010",
+    title: "Crecimiento y Tecnología",
+    description:
+      "Más de una década perfeccionando cada procedimiento. Incorporamos bancos de prueba electrónicos y diagnóstico computarizado. El taller se convirtió en centro de referencia.",
+    accent: "from-silver/20 to-charcoal/85",
+    label: "Equipos de diagnóstico",
+  },
+  {
+    year: "Hoy",
+    title: "Excelencia Reconocida",
+    description:
+      "25+ años de confianza construida motor a motor. Un equipo de más de 15 técnicos especializados y tecnología de punta al servicio de cientos de clientes.",
+    accent: "from-gold/25 to-charcoal/80",
+    label: "El equipo actual",
+  },
+] as const;
+
+export function StorySection({ id = "historia" }: { id?: string }) {
   const containerRef = useRef<HTMLElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
-      if (prefersReducedMotion()) {
-        return;
-      }
+      if (prefersReducedMotion()) return;
 
-      const blocks = gsap.utils.toArray<HTMLElement>("[data-story-block]");
+      const track = trackRef.current;
+      const container = containerRef.current;
+      if (!track || !container) return;
 
-      blocks.forEach((block, index) => {
-        gsap.from(block, {
-          x: index % 2 === 0 ? -64 : 64,
-          y: 24,
-          opacity: 0,
-          duration: DURATION.reveal,
-          ease: EASE.smooth,
-          scrollTrigger: {
-            trigger: block,
-            ...SCROLL_DEFAULTS,
-          },
-        });
+      const panels = gsap.utils.toArray<HTMLElement>("[data-epoch-panel]");
+      if (panels.length === 0) return;
+
+      const totalScroll = track.scrollWidth - window.innerWidth;
+
+      // ── Horizontal scroll: pin container, scrub track left ──
+      const horizontalTween = gsap.to(track, {
+        x: () => -totalScroll,
+        ease: "none",
+        scrollTrigger: {
+          trigger: container,
+          pin: true,
+          scrub: 1,
+          start: "top top",
+          end: () => `+=${totalScroll}`,
+          invalidateOnRefresh: true,
+        },
+      });
+
+      // ── Each panel: content fades/slides in using containerAnimation ──
+      panels.forEach((panel, index) => {
+        const content = panel.querySelector("[data-epoch-content]");
+        const year = panel.querySelector("[data-epoch-year]");
+
+        if (content) {
+          gsap.from(content, {
+            x: 80,
+            opacity: 0,
+            scrollTrigger: {
+              trigger: panel,
+              containerAnimation: horizontalTween,
+              start: "left 80%",
+              end: "left 50%",
+              scrub: true,
+            },
+          });
+        }
+
+        if (year) {
+          gsap.from(year, {
+            scale: 0.5,
+            opacity: 0,
+            scrollTrigger: {
+              trigger: panel,
+              containerAnimation: horizontalTween,
+              start: "left 85%",
+              end: "left 55%",
+              scrub: true,
+            },
+          });
+        }
+
+        // ── Image placeholder parallax (moves slightly slower) ──
+        const img = panel.querySelector("[data-epoch-image]");
+        if (img) {
+          gsap.from(img, {
+            x: 120,
+            scrollTrigger: {
+              trigger: panel,
+              containerAnimation: horizontalTween,
+              start: "left 90%",
+              end: "left 30%",
+              scrub: true,
+            },
+          });
+        }
+
+        // ── Divider line between panels (except last) ──
+        if (index < panels.length - 1) {
+          const divider = panel.querySelector("[data-epoch-divider]");
+          if (divider) {
+            gsap.from(divider, {
+              scaleY: 0,
+              scrollTrigger: {
+                trigger: panel,
+                containerAnimation: horizontalTween,
+                start: "right 60%",
+                end: "right 40%",
+                scrub: true,
+              },
+            });
+          }
+        }
       });
 
       ScrollTrigger.refresh();
@@ -62,50 +137,88 @@ export function StorySection({ id = "historia" }: StorySectionProps) {
   );
 
   return (
-    <section id={id} ref={containerRef} className="bg-warm-white px-6 py-20 md:px-10 md:py-32">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-16 max-w-3xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-gold">Trayectoria</p>
-          <h2 className="mt-4 text-4xl font-bold tracking-tight text-charcoal md:text-5xl">
-            Una historia construida con precisión, experiencia y confianza.
-          </h2>
-        </div>
+    <section id={id} ref={containerRef} className="horizontal-scroll-container relative bg-charcoal">
+      {/* ── Horizontal track ── */}
+      <div ref={trackRef} className="horizontal-scroll-track">
+        {epochs.map((epoch, index) => (
+          <div
+            key={epoch.year}
+            data-epoch-panel
+            className="horizontal-scroll-panel noise-overlay"
+          >
+            {/* Full-bleed gradient background */}
+            <div className={`absolute inset-0 bg-gradient-to-br ${epoch.accent}`} />
 
-        <div className="space-y-10 md:space-y-14">
-          {storyBeats.map((beat, index) => {
-            const isReversed = index % 2 === 1;
+            {/* Decorative gear */}
+            <GearSVG
+              className={`pointer-events-none absolute text-gold/[0.04] ${
+                index === 0
+                  ? "-bottom-20 -right-10 animate-float-slow"
+                  : index === 1
+                    ? "-top-16 -left-12 animate-float"
+                    : "bottom-10 right-[10%] animate-float-delayed"
+              }`}
+              size={index === 2 ? 300 : 200}
+            />
 
-            return (
-              <div key={beat.title}>
+            {/* Timeline dots */}
+            <div className="absolute left-8 top-8 flex items-center gap-4 md:left-12 md:top-12">
+              <div className="flex items-center gap-2">
+                {epochs.map((_, dotIndex) => (
+                  <span
+                    key={dotIndex}
+                    className={`h-2 rounded-full transition-all ${
+                      dotIndex === index
+                        ? "w-8 bg-gold"
+                        : dotIndex < index
+                          ? "w-2 bg-gold/40"
+                          : "w-2 bg-pure-white/20"
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="text-xs uppercase tracking-[0.3em] text-pure-white/40">
+                {index + 1} / {epochs.length}
+              </span>
+            </div>
+
+            {/* Content */}
+            <div className="relative z-10 grid h-full w-full grid-cols-1 items-center gap-8 px-8 md:grid-cols-2 md:px-16 lg:px-24">
+              <div data-epoch-content className={index % 2 === 1 ? "md:order-2" : ""}>
                 <div
-                  data-story-block
-                  className={[
-                    "grid items-center gap-8 rounded-[2rem] bg-pure-white p-6 shadow-[0_30px_80px_-50px_rgba(45,45,45,0.25)] md:grid-cols-2 md:p-10",
-                    isReversed ? "" : "",
-                  ].join(" ")}
+                  data-epoch-year
+                  className="mb-4 font-mono text-7xl font-black tracking-tighter text-gold/20 md:text-[8rem] lg:text-[10rem] leading-none"
                 >
-                  <div className={isReversed ? "md:order-2" : undefined}>
-                    <div className="flex min-h-72 items-end rounded-[1.5rem] bg-[linear-gradient(135deg,_rgba(201,169,110,0.8),_rgba(45,45,45,0.9))] p-6">
-                      <span className="rounded-full bg-pure-white/12 px-4 py-2 text-sm font-medium text-pure-white backdrop-blur-sm">
-                        {beat.label}
-                      </span>
-                    </div>
-                  </div>
+                  {epoch.year}
+                </div>
+                <h3 className="text-3xl font-bold text-pure-white md:text-4xl lg:text-5xl">
+                  {epoch.title}
+                </h3>
+                <p className="mt-6 max-w-lg text-lg leading-relaxed text-silver-light/70 md:text-xl">
+                  {epoch.description}
+                </p>
+              </div>
 
-                  <div className={isReversed ? "md:order-1" : undefined}>
-                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gold">0{index + 1}</p>
-                    <h3 className="mt-4 text-3xl font-semibold text-charcoal">{beat.title}</h3>
-                    <p className="mt-5 text-lg leading-8 text-text-muted">{beat.description}</p>
+              <div data-epoch-image className={`relative ${index % 2 === 1 ? "md:order-1" : ""}`}>
+                <div className="aspect-[4/3] overflow-hidden rounded-3xl border border-pure-white/[0.06] bg-gradient-to-br from-pure-white/[0.08] to-transparent shadow-2xl">
+                  <div className="flex h-full items-end p-6 md:p-8">
+                    <span className="rounded-full bg-pure-white/10 px-4 py-2 text-sm text-pure-white/60 backdrop-blur-sm">
+                      {epoch.label}
+                    </span>
                   </div>
                 </div>
-
-                {index < storyBeats.length - 1 ? (
-                  <div className="mx-auto mt-8 h-px w-28 bg-gradient-to-r from-transparent via-gold to-transparent md:mt-10" />
-                ) : null}
               </div>
-            );
-          })}
-        </div>
+            </div>
+
+            {/* Vertical divider between panels */}
+            {index < epochs.length - 1 && (
+              <div
+                data-epoch-divider
+                className="absolute right-0 top-[15%] h-[70%] w-px origin-top bg-gradient-to-b from-transparent via-gold/30 to-transparent"
+              />
+            )}
+          </div>
+        ))}
       </div>
     </section>
   );

@@ -9,6 +9,12 @@ import { TechnologySection } from "@/components/sections/TechnologySection";
 import { StatsSection } from "@/components/sections/StatsSection";
 import { TrustSection } from "@/components/sections/TrustSection";
 import { ContactSection } from "@/components/sections/ContactSection";
+import {
+  WaveDivider,
+  AngleDivider,
+  GearToothDivider,
+  DoubleWaveDivider,
+} from "@/components/svg/SectionDividers";
 
 const PARTS_BRANDS = [
   { name: "Bosch" },
@@ -44,7 +50,14 @@ export default function Home() {
 
       <main className="overflow-x-hidden">
         <HeroSection />
+
+        {/* Hero → Story: organic wave transition */}
+        <WaveDivider fill="var(--color-warm-white)" className="-mt-1 bg-charcoal" />
+
         <StorySection />
+
+        {/* Story → Brand Carousel: angle cut */}
+        <AngleDivider fill="var(--color-warm-white)" className="-mt-1 bg-charcoal" />
 
         {/* Brand Carousel #1 — Repuestos */}
         <div className="bg-warm-white px-4 py-8 md:py-12">
@@ -57,7 +70,14 @@ export default function Home() {
         </div>
 
         <ServicesSection />
+
+        {/* Services → Technology: gear tooth (mechanical feel) */}
+        <GearToothDivider fill="var(--color-charcoal)" className="-mb-1 bg-warm-white" />
+
         <TechnologySection />
+
+        {/* Technology → Brand Carousel: wave transition */}
+        <WaveDivider fill="var(--color-warm-white)" className="-mt-1 bg-charcoal" />
 
         {/* Brand Carousel #2 — Vehículos */}
         <div className="bg-warm-white px-4 py-8 md:py-12">
@@ -69,8 +89,19 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Brand Carousel → Stats: angle cut to dark section */}
+        <AngleDivider fill="var(--color-charcoal)" className="-mb-1 bg-warm-white" />
+
         <StatsSection />
+
+        {/* Stats → Trust: double wave (dark to light) */}
+        <DoubleWaveDivider fill="var(--color-warm-white)" className="-mt-1 bg-charcoal" />
+
         <TrustSection />
+
+        {/* Trust → Contact: gear tooth (light to dark) */}
+        <GearToothDivider fill="var(--color-charcoal)" className="-mb-1 bg-warm-white" />
+
         <ContactSection />
       </main>
 

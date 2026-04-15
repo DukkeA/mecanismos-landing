@@ -4,46 +4,60 @@ import { useRef } from "react";
 import { DURATION, EASE, SCROLL_DEFAULTS, prefersReducedMotion } from "@/lib/animations";
 import { gsap, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
 
-interface TechnologySectionProps {
-  id?: string;
-}
+registerGSAPPlugins();
 
 const features = [
   "Banco de pruebas para inyectores Common Rail",
   "Diagnóstico electrónico automotriz",
   "Equipo de ultrasonido para limpieza",
   "Software de calibración actualizado",
+  "Herramientas de micrómetro de precisión",
+  "Sala limpia para ensamble de inyectores",
 ] as const;
 
-registerGSAPPlugins();
-
-export function TechnologySection({ id = "tecnologia" }: TechnologySectionProps) {
+export function TechnologySection({ id = "tecnologia" }: { id?: string }) {
   const containerRef = useRef<HTMLElement>(null);
 
   useGSAP(
     () => {
-      if (prefersReducedMotion()) {
-        return;
-      }
+      if (prefersReducedMotion()) return;
 
-      gsap.from("[data-tech-copy]", {
+      const container = containerRef.current;
+      if (!container) return;
+
+      // ── Background zoom on scroll ──
+      gsap.to("[data-tech-bg]", {
+        scale: 1.15,
+        ease: "none",
+        scrollTrigger: {
+          trigger: container,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: true,
+        },
+      });
+
+      // ── Text reveal from left ──
+      gsap.from("[data-tech-content]", {
         x: -60,
         opacity: 0,
         duration: DURATION.reveal,
         ease: EASE.smooth,
         scrollTrigger: {
-          trigger: containerRef.current,
+          trigger: container,
           ...SCROLL_DEFAULTS,
         },
       });
 
-      gsap.from("[data-tech-image]", {
-        x: 60,
+      // ── Feature list stagger ──
+      gsap.from("[data-tech-feature]", {
+        x: -30,
         opacity: 0,
-        duration: DURATION.reveal,
-        ease: EASE.smooth,
+        duration: 0.6,
+        ease: EASE.snappy,
+        stagger: 0.08,
         scrollTrigger: {
-          trigger: containerRef.current,
+          trigger: "[data-tech-features]",
           ...SCROLL_DEFAULTS,
         },
       });
@@ -52,35 +66,74 @@ export function TechnologySection({ id = "tecnologia" }: TechnologySectionProps)
   );
 
   return (
-    <section id={id} ref={containerRef} className="bg-charcoal px-6 py-20 md:px-10 md:py-32">
-      <div className="mx-auto grid max-w-6xl items-center gap-10 md:grid-cols-2 md:gap-16">
-        <div data-tech-copy>
-          <span className="inline-flex rounded-full border border-gold/20 bg-gold/10 px-4 py-2 text-sm font-semibold uppercase tracking-[0.2em] text-gold">
+    <section
+      id={id}
+      ref={containerRef}
+      className="relative min-h-screen overflow-hidden"
+    >
+      {/* ── Full-bleed background with zoom ── */}
+      <div
+        data-tech-bg
+        className="absolute inset-0 scale-100 bg-charcoal"
+      >
+        {/* Gradient placeholder for real image */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_right,_rgba(201,169,110,0.15),_transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(184,184,184,0.08),_transparent_50%)]" />
+      </div>
+
+      {/* ── Dark overlay for text readability ── */}
+      <div className="absolute inset-0 bg-gradient-to-r from-charcoal/95 via-charcoal/80 to-charcoal/40" />
+
+      {/* ── Content ── */}
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl items-center px-6 py-24 md:px-10 md:py-32">
+        <div data-tech-content className="max-w-2xl">
+          <span className="inline-flex rounded-full border border-gold/20 bg-gold/10 px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.24em] text-gold">
             Tecnología de Punta
           </span>
-          <h2 className="mt-6 text-4xl font-bold tracking-tight text-pure-white md:text-5xl">
-            Equipos de Última Generación
+
+          <h2 className="mt-8 text-4xl font-bold tracking-tight text-pure-white md:text-5xl lg:text-6xl">
+            Equipos de{" "}
+            <span className="text-gradient-gold">última generación</span>
           </h2>
-          <p className="mt-6 text-lg leading-8 text-silver">
-            Contamos con bancos de prueba electrónicos, equipos de diagnóstico computarizado y herramientas de precisión que nos permiten identificar y resolver cualquier falla con exactitud milimétrica.
+
+          <p className="mt-6 text-lg leading-relaxed text-silver-light/70 md:text-xl">
+            Contamos con bancos de prueba electrónicos, equipos de diagnóstico
+            computarizado y herramientas de precisión que nos permiten
+            identificar y resolver cualquier falla con exactitud milimétrica.
           </p>
 
-          <ul className="mt-8 space-y-4">
+          <div data-tech-features className="mt-10 grid gap-3 sm:grid-cols-2">
             {features.map((feature) => (
-              <li key={feature} className="flex items-start gap-3 text-base leading-7 text-text-light">
-                <span className="mt-1 text-gold">✓</span>
-                <span>{feature}</span>
-              </li>
+              <div
+                key={feature}
+                data-tech-feature
+                className="flex items-start gap-3 rounded-xl border border-pure-white/[0.06] bg-pure-white/[0.03] px-4 py-3 backdrop-blur-sm"
+              >
+                <span className="mt-0.5 text-gold">✓</span>
+                <span className="text-sm leading-relaxed text-text-light/80">
+                  {feature}
+                </span>
+              </div>
             ))}
-          </ul>
-        </div>
-
-        <div data-tech-image className="rounded-[2rem] border border-pure-white/8 bg-[linear-gradient(135deg,_rgba(255,255,255,0.14),_rgba(184,184,184,0.08))] p-4 shadow-[0_40px_100px_-50px_rgba(0,0,0,0.85)]">
-          <div className="flex min-h-[24rem] items-end rounded-[1.5rem] bg-[linear-gradient(135deg,_rgba(201,169,110,0.65),_rgba(70,70,70,0.95))] p-8">
-            <span className="rounded-full bg-charcoal/35 px-4 py-2 text-sm font-medium text-pure-white backdrop-blur-sm">
-              Equipos de diagnóstico
-            </span>
           </div>
+
+          <a
+            href="#contacto"
+            className="group mt-10 inline-flex items-center gap-3 rounded-full bg-gold px-8 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-charcoal transition-all duration-300 hover:shadow-[0_0_40px_rgba(201,169,110,0.35)]"
+          >
+            <span>Conoce nuestro taller</span>
+            <span className="transition-transform group-hover:translate-x-1">→</span>
+          </a>
+        </div>
+      </div>
+
+      {/* ── Floating label (right side) — placeholder for actual equipment photo ── */}
+      <div className="pointer-events-none absolute bottom-12 right-8 z-10 md:bottom-16 md:right-16">
+        <div className="rounded-2xl border border-pure-white/10 bg-charcoal/60 px-6 py-4 backdrop-blur-lg">
+          <p className="text-xs uppercase tracking-[0.25em] text-gold">Equipos</p>
+          <p className="mt-1 text-sm text-silver-light/60">
+            Banco de pruebas Common Rail
+          </p>
         </div>
       </div>
     </section>

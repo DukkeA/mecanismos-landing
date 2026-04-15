@@ -1,33 +1,68 @@
 "use client";
 
 import { useRef } from "react";
-import { ServiceCard } from "@/components/ui/ServiceCard";
-import { DURATION, EASE, SCROLL_DEFAULTS, STAGGER, prefersReducedMotion } from "@/lib/animations";
+import { DURATION, EASE, SCROLL_DEFAULTS, prefersReducedMotion } from "@/lib/animations";
 import { gsap, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
-
-interface ServicesSectionProps {
-  id?: string;
-}
 
 registerGSAPPlugins();
 
-export function ServicesSection({ id = "servicios" }: ServicesSectionProps) {
+const services = [
+  {
+    title: "Inyección Diésel",
+    description:
+      "Diagnóstico, reparación y calibración de bombas e inyectores diésel. Trabajamos con sistemas Common Rail, bomba rotativa y bomba en línea de las principales marcas.",
+    icon: InjectorIcon,
+    stat: "8.000+",
+    statLabel: "inyectores reparados",
+  },
+  {
+    title: "Motores Diésel",
+    description:
+      "Reparación integral de motores diésel para vehículos livianos y pesados. Diagnóstico computarizado, ajuste y reconstrucción con repuestos originales.",
+    icon: EngineIcon,
+    stat: "2.500+",
+    statLabel: "motores reconstruidos",
+  },
+  {
+    title: "Transmisiones Automáticas",
+    description:
+      "Servicio completo de transmisiones automáticas: diagnóstico electrónico, reparación, cambio de aceite y mantenimiento preventivo.",
+    icon: TransmissionIcon,
+    stat: "1.200+",
+    statLabel: "transmisiones reparadas",
+  },
+] as const;
+
+export function ServicesSection({ id = "servicios" }: { id?: string }) {
   const containerRef = useRef<HTMLElement>(null);
 
   useGSAP(
     () => {
-      if (prefersReducedMotion()) {
-        return;
-      }
+      if (prefersReducedMotion()) return;
 
-      gsap.from("[data-service-card]", {
-        y: 48,
+      // ── Staggered reveal for each service block ──
+      gsap.utils.toArray<HTMLElement>("[data-service-block]").forEach((block, index) => {
+        const isEven = index % 2 === 0;
+        gsap.from(block, {
+          x: isEven ? -80 : 80,
+          opacity: 0,
+          duration: DURATION.reveal,
+          ease: EASE.smooth,
+          scrollTrigger: {
+            trigger: block,
+            ...SCROLL_DEFAULTS,
+          },
+        });
+      });
+
+      // ── Section header ──
+      gsap.from("[data-services-header]", {
+        y: 40,
         opacity: 0,
         duration: DURATION.reveal,
-        ease: EASE.snappy,
-        stagger: STAGGER.cards,
+        ease: EASE.smooth,
         scrollTrigger: {
-          trigger: "[data-services-grid]",
+          trigger: containerRef.current,
           ...SCROLL_DEFAULTS,
         },
       });
@@ -36,51 +71,90 @@ export function ServicesSection({ id = "servicios" }: ServicesSectionProps) {
   );
 
   return (
-    <section id={id} ref={containerRef} className="bg-pure-white px-6 py-20 md:px-10 md:py-32">
-      <div className="mx-auto max-w-6xl">
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-gold">Servicios</p>
-          <h2 className="mt-4 text-4xl font-bold tracking-tight text-charcoal md:text-5xl">
-            Nuestros Servicios
-          </h2>
-          <div className="mx-auto mt-5 h-1 w-24 rounded-full bg-gold" />
-          <p className="mt-6 text-lg leading-8 text-text-muted">
-            Soluciones integrales para sistemas diésel y transmisiones automáticas
+    <section
+      id={id}
+      ref={containerRef}
+      className="noise-overlay relative overflow-hidden bg-warm-white py-24 md:py-36"
+    >
+      {/* Subtle diagonal background accent */}
+      <div className="absolute inset-0 bg-[linear-gradient(135deg,_transparent_40%,_rgba(201,169,110,0.04)_40%,_rgba(201,169,110,0.04)_60%,_transparent_60%)]" />
+
+      <div className="relative z-10 mx-auto max-w-7xl px-6 md:px-10">
+        {/* Header */}
+        <div data-services-header className="mb-20 max-w-3xl md:mb-28">
+          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-gold">
+            Servicios
           </p>
+          <h2 className="mt-5 text-4xl font-bold tracking-tight text-charcoal md:text-5xl lg:text-6xl">
+            Soluciones integrales para{" "}
+            <span className="text-gradient-gold">cada sistema</span>
+          </h2>
         </div>
 
-        <div data-services-grid className="mt-14 grid gap-6 md:grid-cols-3">
-          <div data-service-card>
-            <ServiceCard
-              title="Inyección Diésel"
-              description="Diagnóstico, reparación y calibración de bombas e inyectores diésel. Trabajamos con sistemas Common Rail, bomba rotativa y bomba en línea de las principales marcas."
-              icon={<InjectorIcon className="h-7 w-7" />}
-            />
-          </div>
-          <div data-service-card>
-            <ServiceCard
-              title="Motores Diésel"
-              description="Reparación integral de motores diésel para vehículos livianos y pesados. Diagnóstico computarizado, ajuste y reconstrucción con repuestos originales."
-              icon={<EngineIcon className="h-7 w-7" />}
-            />
-          </div>
-          <div data-service-card>
-            <ServiceCard
-              title="Transmisiones Automáticas"
-              description="Servicio completo de transmisiones automáticas: diagnóstico electrónico, reparación, cambio de aceite y mantenimiento preventivo."
-              icon={<TransmissionIcon className="h-7 w-7" />}
-            />
-          </div>
-        </div>
+        {/* Service blocks — alternating layout */}
+        <div className="space-y-20 md:space-y-32">
+          {services.map((service, index) => {
+            const isEven = index % 2 === 0;
+            const Icon = service.icon;
 
-        <div className="mt-12 text-center">
-          <p className="text-base text-text-muted">¿Necesitas un diagnóstico?</p>
-          <a
-            className="mt-4 inline-flex rounded-full bg-gold px-7 py-3 text-sm font-semibold uppercase tracking-[0.16em] text-charcoal transition hover:bg-gold-light"
-            href="#contacto"
-          >
-            Escríbenos por WhatsApp
-          </a>
+            return (
+              <div
+                key={service.title}
+                data-service-block
+                className={`grid items-center gap-10 md:grid-cols-2 md:gap-16 lg:gap-24 ${
+                  isEven ? "" : "md:[direction:rtl]"
+                }`}
+              >
+                {/* Text content */}
+                <div className={isEven ? "" : "md:[direction:ltr]"}>
+                  <div className="mb-6 flex items-center gap-4">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-charcoal text-gold shadow-lg shadow-charcoal/20">
+                      <Icon className="h-7 w-7" />
+                    </div>
+                    <span className="text-6xl font-black text-charcoal/[0.06] md:text-7xl">
+                      0{index + 1}
+                    </span>
+                  </div>
+                  <h3 className="text-3xl font-bold text-charcoal md:text-4xl">
+                    {service.title}
+                  </h3>
+                  <p className="mt-5 text-lg leading-relaxed text-text-muted">
+                    {service.description}
+                  </p>
+                  <a
+                    href="#contacto"
+                    className="group mt-8 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-gold transition-colors hover:text-gold-dark"
+                  >
+                    Solicitar diagnóstico
+                    <span className="transition-transform group-hover:translate-x-1">→</span>
+                  </a>
+                </div>
+
+                {/* Visual card with stat */}
+                <div className={isEven ? "" : "md:[direction:ltr]"}>
+                  <div className="relative overflow-hidden rounded-[2rem] bg-charcoal p-1 shadow-2xl">
+                    {/* Image placeholder */}
+                    <div className="aspect-[4/3] overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-gold/20 via-charcoal to-charcoal/95">
+                      <div className="flex h-full items-end p-8">
+                        <span className="rounded-full bg-pure-white/10 px-4 py-2 text-sm text-pure-white/60 backdrop-blur-sm">
+                          {service.title}
+                        </span>
+                      </div>
+                    </div>
+                    {/* Floating stat badge */}
+                    <div className="absolute -bottom-4 right-6 rounded-2xl border border-gold/30 bg-charcoal px-6 py-4 shadow-xl md:-bottom-6 md:right-8">
+                      <div className="text-2xl font-bold text-gold md:text-3xl">
+                        {service.stat}
+                      </div>
+                      <div className="text-xs uppercase tracking-[0.2em] text-silver-light/60">
+                        {service.statLabel}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

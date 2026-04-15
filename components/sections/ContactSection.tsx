@@ -2,33 +2,74 @@
 
 import { useRef } from "react";
 import { WhatsAppForm } from "@/components/ui/WhatsAppForm";
-import { DURATION, EASE, SCROLL_DEFAULTS, prefersReducedMotion } from "@/lib/animations";
+import { DURATION, EASE, prefersReducedMotion } from "@/lib/animations";
 import { gsap, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
+
+registerGSAPPlugins();
 
 interface ContactSectionProps {
   id?: string;
 }
-
-registerGSAPPlugins();
 
 export function ContactSection({ id = "contacto" }: ContactSectionProps) {
   const containerRef = useRef<HTMLElement>(null);
 
   useGSAP(
     () => {
-      if (prefersReducedMotion()) {
-        return;
-      }
+      if (prefersReducedMotion()) return;
 
-      gsap.from("[data-contact-panel]", {
-        y: 36,
+      const container = containerRef.current;
+      if (!container) return;
+
+      // ── Background parallax ──
+      gsap.to("[data-contact-bg]", {
+        yPercent: -15,
+        ease: "none",
+        scrollTrigger: {
+          trigger: container,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: true,
+        },
+      });
+
+      // ── Left content reveal ──
+      gsap.from("[data-contact-info]", {
+        x: -60,
         opacity: 0,
         duration: DURATION.reveal,
         ease: EASE.smooth,
-        stagger: 0.12,
         scrollTrigger: {
-          trigger: containerRef.current,
-          ...SCROLL_DEFAULTS,
+          trigger: container,
+          start: "top 70%",
+          toggleActions: "play none none none",
+        },
+      });
+
+      // ── Contact items stagger ──
+      gsap.from("[data-contact-item]", {
+        x: -30,
+        opacity: 0,
+        duration: 0.6,
+        ease: EASE.snappy,
+        stagger: 0.1,
+        scrollTrigger: {
+          trigger: "[data-contact-items]",
+          start: "top 80%",
+          toggleActions: "play none none none",
+        },
+      });
+
+      // ── Form panel slide in from right ──
+      gsap.from("[data-contact-form]", {
+        x: 80,
+        opacity: 0,
+        duration: DURATION.slow,
+        ease: EASE.smooth,
+        scrollTrigger: {
+          trigger: "[data-contact-form]",
+          start: "top 80%",
+          toggleActions: "play none none none",
         },
       });
     },
@@ -36,47 +77,173 @@ export function ContactSection({ id = "contacto" }: ContactSectionProps) {
   );
 
   return (
-    <section id={id} ref={containerRef} className="bg-charcoal px-6 py-20 md:px-10 md:py-32">
-      <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-[1.05fr_0.95fr] md:gap-12">
-        <div data-contact-panel>
-          <h2 className="text-4xl font-bold tracking-tight text-pure-white md:text-5xl">
-            ¿Listo para darle vida a tu motor?
-          </h2>
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-silver">
-            Escríbenos por WhatsApp y agenda tu diagnóstico. Respondemos en minutos.
-          </p>
+    <section
+      id={id}
+      ref={containerRef}
+      className="noise-overlay relative min-h-screen overflow-hidden"
+    >
+      {/* ── Multi-layer background ── */}
+      <div className="absolute inset-0 bg-charcoal" />
 
-          <div className="mt-10 space-y-5">
-            <ContactItem icon="⌖" text="Carrera 16 #8-04, Bogotá D.C." />
-            <ContactItem icon="✆" text="310 561 4469" />
-            <ContactItem icon="⏰" text="Lun - Vie: 8:00 AM - 6:00 PM | Sáb: 8:00 AM - 1:00 PM" />
-          </div>
+      <div
+        data-contact-bg
+        className="absolute inset-x-0 -top-20 bottom-0"
+      >
+        {/* Radial glow from left */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_0%_50%,_rgba(201,169,110,0.12),_transparent)]" />
+        {/* Subtle glow right */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_100%_30%,_rgba(184,184,184,0.06),_transparent_50%)]" />
+      </div>
 
-          <div className="mt-10 rounded-[2rem] border border-pure-white/10 bg-[linear-gradient(135deg,_rgba(255,255,255,0.08),_rgba(184,184,184,0.04))] p-4">
-            <div className="flex min-h-64 items-end rounded-[1.5rem] bg-[linear-gradient(135deg,_rgba(208,208,208,0.35),_rgba(45,45,45,0.8))] p-6">
-              <span className="rounded-full bg-pure-white/12 px-4 py-2 text-sm text-pure-white backdrop-blur-sm">
-                Mapa de ubicación
-              </span>
+      {/* Grid pattern */}
+      <div
+        className="absolute inset-0 opacity-[0.02]"
+        style={{
+          backgroundImage: `linear-gradient(rgba(201,169,110,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(201,169,110,0.4) 1px, transparent 1px)`,
+          backgroundSize: "60px 60px",
+        }}
+      />
+
+      {/* ── Content ── */}
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl items-center px-6 py-24 md:px-10 md:py-32">
+        <div className="grid w-full gap-12 md:grid-cols-[1.1fr_0.9fr] md:gap-16 lg:gap-24">
+          {/* ── Left: Info column ── */}
+          <div data-contact-info>
+            <span className="inline-flex rounded-full border border-gold/20 bg-gold/10 px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.24em] text-gold">
+              Contacto
+            </span>
+
+            <h2 className="mt-8 text-4xl font-bold tracking-tight text-pure-white md:text-5xl lg:text-6xl">
+              ¿Listo para darle vida{" "}
+              <span className="text-gradient-gold">a tu motor?</span>
+            </h2>
+
+            <p className="mt-6 max-w-lg text-lg leading-relaxed text-silver-light/60 md:text-xl">
+              Escríbenos por WhatsApp y agenda tu diagnóstico. Respondemos en
+              minutos.
+            </p>
+
+            {/* Contact details */}
+            <div data-contact-items className="mt-10 space-y-4">
+              <ContactItem
+                icon={<LocationIcon />}
+                label="Dirección"
+                text="Carrera 16 #8-04, Bogotá D.C."
+              />
+              <ContactItem
+                icon={<PhoneIcon />}
+                label="Teléfono"
+                text="310 561 4469"
+              />
+              <ContactItem
+                icon={<ClockIcon />}
+                label="Horario"
+                text="Lun - Vie: 8:00 AM - 6:00 PM | Sáb: 8:00 AM - 1:00 PM"
+              />
+            </div>
+
+            {/* Map placeholder */}
+            <div className="mt-10 overflow-hidden rounded-[2rem] border border-pure-white/[0.06] bg-[linear-gradient(135deg,_rgba(255,255,255,0.04),_rgba(184,184,184,0.02))] p-1">
+              <div className="flex min-h-56 items-end rounded-[1.75rem] bg-gradient-to-br from-gold/10 via-charcoal to-charcoal/95 p-6">
+                <span className="rounded-full bg-pure-white/10 px-4 py-2 text-sm text-pure-white/50 backdrop-blur-sm">
+                  📍 Mapa de ubicación
+                </span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div data-contact-panel>
-          <WhatsAppForm />
+          {/* ── Right: Form panel ── */}
+          <div
+            data-contact-form
+            className="flex items-center"
+          >
+            <div className="w-full overflow-hidden rounded-[2.5rem] border border-pure-white/[0.08] bg-[linear-gradient(145deg,_rgba(255,255,255,0.06),_rgba(255,255,255,0.02))] p-8 shadow-2xl backdrop-blur-sm md:p-10">
+              {/* Top accent line */}
+              <div className="absolute left-0 right-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
+
+              <p className="mb-8 text-center text-sm font-semibold uppercase tracking-[0.24em] text-gold">
+                Envíanos tu consulta
+              </p>
+
+              <WhatsAppForm />
+            </div>
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-function ContactItem({ icon, text }: { icon: string; text: string }) {
+function ContactItem({
+  icon,
+  label,
+  text,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  text: string;
+}) {
   return (
-    <div className="flex items-start gap-4">
-      <span className="mt-1 inline-flex h-10 w-10 items-center justify-center rounded-full bg-gold/10 text-gold">
+    <div
+      data-contact-item
+      className="group flex items-start gap-4 rounded-xl border border-pure-white/[0.04] bg-pure-white/[0.02] px-5 py-4 transition-colors duration-200 hover:border-gold/10 hover:bg-pure-white/[0.04]"
+    >
+      <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gold/10 text-gold">
         {icon}
       </span>
-      <p className="text-base leading-7 text-text-light">{text}</p>
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold/60">
+          {label}
+        </p>
+        <p className="mt-1 text-base leading-relaxed text-text-light/80">
+          {text}
+        </p>
+      </div>
     </div>
+  );
+}
+
+function LocationIcon() {
+  return (
+    <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24">
+      <path
+        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+      <circle cx="12" cy="9" r="2.5" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
+function PhoneIcon() {
+  return (
+    <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24">
+      <path
+        d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
+function ClockIcon() {
+  return (
+    <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.8" />
+      <path
+        d="M12 6v6l4 2"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+    </svg>
   );
 }
 
