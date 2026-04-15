@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { GearSVG } from "@/components/svg/GearSVG";
 import { prefersReducedMotion } from "@/lib/animations";
 import { gsap, ScrollTrigger, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
@@ -14,7 +15,9 @@ const epochs = [
     description:
       "Un pequeño taller en el corazón de Bogotá. Con herramientas básicas y una pasión inagotable por los motores diésel, nació Mecanismos Técnicos.",
     accent: "from-gold-dark/30 to-charcoal/90",
-    label: "Foto del primer taller",
+    label: "Taller mecánico de los inicios",
+    image:
+      "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=800&q=75&auto=format&fit=crop",
   },
   {
     year: "2010",
@@ -22,7 +25,9 @@ const epochs = [
     description:
       "Más de una década perfeccionando cada procedimiento. Incorporamos bancos de prueba electrónicos y diagnóstico computarizado. El taller se convirtió en centro de referencia.",
     accent: "from-silver/20 to-charcoal/85",
-    label: "Equipos de diagnóstico",
+    label: "Equipos de diagnóstico electrónico",
+    image:
+      "https://images.unsplash.com/photo-1615906655593-ad0386982a0f?w=800&q=75&auto=format&fit=crop",
   },
   {
     year: "Hoy",
@@ -30,7 +35,9 @@ const epochs = [
     description:
       "25+ años de confianza construida motor a motor. Un equipo de más de 15 técnicos especializados y tecnología de punta al servicio de cientos de clientes.",
     accent: "from-gold/25 to-charcoal/80",
-    label: "El equipo actual",
+    label: "Equipo de mecánicos profesionales",
+    image:
+      "https://images.unsplash.com/photo-1504222490345-c075b6008014?w=800&q=75&auto=format&fit=crop",
   },
 ] as const;
 
@@ -200,12 +207,14 @@ export function StorySection({ id = "historia" }: { id?: string }) {
               </div>
 
               <div data-epoch-image className={`relative ${index % 2 === 1 ? "md:order-1" : ""}`}>
-                <div className="aspect-[4/3] overflow-hidden rounded-3xl border border-pure-white/[0.06] bg-gradient-to-br from-pure-white/[0.08] to-transparent shadow-2xl">
-                  <div className="flex h-full items-end p-6 md:p-8">
-                    <span className="rounded-full bg-pure-white/10 px-4 py-2 text-sm text-pure-white/60 backdrop-blur-sm">
-                      {epoch.label}
-                    </span>
-                  </div>
+                <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-pure-white/[0.06] shadow-2xl">
+                  <Image
+                    alt={epoch.label}
+                    className="object-cover"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    src={epoch.image}
+                  />
                 </div>
               </div>
             </div>

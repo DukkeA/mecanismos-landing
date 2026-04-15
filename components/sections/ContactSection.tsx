@@ -142,13 +142,16 @@ export function ContactSection({ id = "contacto" }: ContactSectionProps) {
               />
             </div>
 
-            {/* Map placeholder */}
-            <div className="mt-10 overflow-hidden rounded-[2rem] border border-pure-white/[0.06] bg-[linear-gradient(135deg,_rgba(255,255,255,0.04),_rgba(184,184,184,0.02))] p-1">
-              <div className="flex min-h-56 items-end rounded-[1.75rem] bg-gradient-to-br from-gold/10 via-charcoal to-charcoal/95 p-6">
-                <span className="rounded-full bg-pure-white/10 px-4 py-2 text-sm text-pure-white/50 backdrop-blur-sm">
-                  📍 Mapa de ubicación
-                </span>
-              </div>
+            {/* Map embed */}
+            <div className="mt-10 overflow-hidden rounded-[2rem] border border-pure-white/[0.06]">
+              <iframe
+                className="h-56 w-full md:h-64"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                src="https://www.openstreetmap.org/export/embed.html?bbox=-74.0900%2C4.5940%2C-74.0800%2C4.6010&layer=mapnik&marker=4.5975%2C-74.0850"
+                style={{ border: 0, filter: "grayscale(0.6) contrast(1.1)" }}
+                title="Ubicación de Mecanismos Técnicos en Bogotá"
+              />
             </div>
           </div>
 

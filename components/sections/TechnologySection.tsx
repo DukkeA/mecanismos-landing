@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { DURATION, EASE, SCROLL_DEFAULTS, prefersReducedMotion } from "@/lib/animations";
 import { gsap, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
 
@@ -74,9 +75,17 @@ export function TechnologySection({ id = "tecnologia" }: { id?: string }) {
       {/* ── Full-bleed background with zoom ── */}
       <div
         data-tech-bg
-        className="absolute inset-0 scale-100 bg-charcoal"
+        className="absolute inset-0 scale-100"
       >
-        {/* Gradient placeholder for real image */}
+        <Image
+          alt="Interior de taller mecánico con equipos de diagnóstico"
+          className="object-cover"
+          fill
+          priority
+          sizes="100vw"
+          src="https://images.unsplash.com/photo-1581093458791-9d42e3c2fd45?w=1600&q=70&auto=format&fit=crop"
+        />
+        {/* Gradient overlays on top of the image */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_right,_rgba(201,169,110,0.15),_transparent_60%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(184,184,184,0.08),_transparent_50%)]" />
       </div>

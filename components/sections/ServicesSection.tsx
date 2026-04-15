@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { DURATION, EASE, SCROLL_DEFAULTS, prefersReducedMotion } from "@/lib/animations";
 import { gsap, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
 
@@ -14,6 +15,8 @@ const services = [
     icon: InjectorIcon,
     stat: "8.000+",
     statLabel: "inyectores reparados",
+    image:
+      "https://images.unsplash.com/photo-1635784439498-7ef9e164d09b?w=800&q=75&auto=format&fit=crop",
   },
   {
     title: "Motores Diésel",
@@ -22,6 +25,8 @@ const services = [
     icon: EngineIcon,
     stat: "2.500+",
     statLabel: "motores reconstruidos",
+    image:
+      "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&q=75&auto=format&fit=crop",
   },
   {
     title: "Transmisiones Automáticas",
@@ -30,6 +35,8 @@ const services = [
     icon: TransmissionIcon,
     stat: "1.200+",
     statLabel: "transmisiones reparadas",
+    image:
+      "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&q=75&auto=format&fit=crop",
   },
 ] as const;
 
@@ -133,13 +140,15 @@ export function ServicesSection({ id = "servicios" }: { id?: string }) {
                 {/* Visual card with stat */}
                 <div className={isEven ? "" : "md:[direction:ltr]"}>
                   <div className="relative overflow-hidden rounded-[2rem] bg-charcoal p-1 shadow-2xl">
-                    {/* Image placeholder */}
-                    <div className="aspect-[4/3] overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-gold/20 via-charcoal to-charcoal/95">
-                      <div className="flex h-full items-end p-8">
-                        <span className="rounded-full bg-pure-white/10 px-4 py-2 text-sm text-pure-white/60 backdrop-blur-sm">
-                          {service.title}
-                        </span>
-                      </div>
+                    {/* Service image */}
+                    <div className="relative aspect-[4/3] overflow-hidden rounded-[1.75rem]">
+                      <Image
+                        alt={service.title}
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        src={service.image}
+                      />
                     </div>
                     {/* Floating stat badge */}
                     <div className="absolute -bottom-4 right-6 rounded-2xl border border-gold/30 bg-charcoal px-6 py-4 shadow-xl md:-bottom-6 md:right-8">
