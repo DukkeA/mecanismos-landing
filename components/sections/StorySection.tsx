@@ -144,7 +144,17 @@ export function StorySection({ id = "historia" }: { id?: string }) {
   );
 
   return (
-    <section id={id} ref={containerRef} className="horizontal-scroll-container relative bg-charcoal">
+    <section id={id} ref={containerRef} className="horizontal-scroll-container relative bg-charcoal story-section-clip">
+      {/* Inline SVG clipPath for the wave-cut top edge.
+          Uses objectBoundingBox units (0-1) so it scales to any element size.
+          The wave occupies roughly the top 6% of the section; below that is fully visible. */}
+      <svg width="0" height="0" aria-hidden="true" className="absolute">
+        <defs>
+          <clipPath id="wave-clip-hero-story" clipPathUnits="objectBoundingBox">
+            <path d="M0,0.06 C0.15,0 0.3,0.08 0.5,0.04 C0.7,0 0.85,0.08 1,0.03 L1,1 L0,1 Z" />
+          </clipPath>
+        </defs>
+      </svg>
       {/* ── Horizontal track ── */}
       <div ref={trackRef} className="horizontal-scroll-track">
         {epochs.map((epoch, index) => (

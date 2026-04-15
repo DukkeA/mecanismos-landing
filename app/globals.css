@@ -222,6 +222,21 @@ html {
   overflow: hidden;
 }
 
+/* Wave clip on Story section — overlaps Hero and cuts the top edge
+   so Hero's real background shows through the wave shape. */
+.story-section-clip {
+  position: relative;
+  margin-top: -60px;
+  clip-path: url(#wave-clip-hero-story);
+  z-index: 1;
+}
+
+@media (min-width: 768px) {
+  .story-section-clip {
+    margin-top: -80px;
+  }
+}
+
 .horizontal-scroll-track {
   display: flex;
   width: max-content;
