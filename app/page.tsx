@@ -62,11 +62,15 @@ export default function Home() {
             Contact:          charcoal
         ══════════════════════════════════════════════════════ */}
 
-        <HeroSection />
+        {/* Wrapper ensures charcoal always backs the wave-clip zone
+             between Hero and Story — prevents body white bleeding through */}
+        <div className="bg-charcoal">
+          <HeroSection />
 
-        {/* Hero (charcoal) → Story (charcoal): same bg, no divider needed */}
+          {/* Hero (charcoal) → Story (charcoal): wave clip mask on Story top */}
 
-        <StorySection />
+          <StorySection />
+        </div>
 
         {/* Story (charcoal) → Brand Carousel (warm-white): wave transition */}
         <WaveDivider

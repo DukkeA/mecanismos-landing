@@ -178,8 +178,8 @@ export function StorySection({ id = "historia" }: { id?: string }) {
               size={index === 2 ? 300 : 200}
             />
 
-            {/* Timeline dots */}
-            <div className="absolute left-8 top-8 flex items-center gap-4 md:left-12 md:top-12">
+            {/* Timeline dots — extra top offset to clear the wave clip-path */}
+            <div className="absolute left-8 top-20 flex items-center gap-4 md:left-12 md:top-24">
               <div className="flex items-center gap-2">
                 {epochs.map((_, dotIndex) => (
                   <span

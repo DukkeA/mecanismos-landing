@@ -223,7 +223,8 @@ html {
 }
 
 /* Wave clip on Story section — overlaps Hero and cuts the top edge
-   so Hero's real background shows through the wave shape. */
+   so Hero's real background shows through the wave shape.
+   padding-top compensates so panel content (timeline dots) isn't clipped. */
 .story-section-clip {
   position: relative;
   margin-top: -60px;
