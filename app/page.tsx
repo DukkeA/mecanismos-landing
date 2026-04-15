@@ -9,12 +9,7 @@ import { TechnologySection } from "@/components/sections/TechnologySection";
 import { StatsSection } from "@/components/sections/StatsSection";
 import { TrustSection } from "@/components/sections/TrustSection";
 import { ContactSection } from "@/components/sections/ContactSection";
-import {
-  WaveDivider,
-  AngleDivider,
-  GearToothDivider,
-  DoubleWaveDivider,
-} from "@/components/svg/SectionDividers";
+import { AngleDivider } from "@/components/svg/SectionDividers";
 
 const PARTS_BRANDS = [
   { name: "Bosch" },
@@ -43,38 +38,31 @@ const VEHICLE_BRANDS = [
   { name: "Kia" },
 ];
 
+/**
+ * Section Transition Map — dividers are INSIDE each section as last child.
+ *
+ *   Hero             (charcoal)     — no divider (same bg as Story)
+ *   Story            (charcoal)     — WaveDivider → warm-white (inside Story)
+ *   Brand Carousel 1 (warm-white)   — no divider (same bg as Services)
+ *   Services         (warm-white)   — GearToothDivider → charcoal (inside Services)
+ *   Technology       (charcoal)     — WaveDivider → warm-white (inside Technology)
+ *   Brand Carousel 2 (warm-white)   — AngleDivider → charcoal (inside wrapper here)
+ *   Stats            (charcoal)     — DoubleWaveDivider → warm-white (inside Stats)
+ *   Trust            (warm-white)   — GearToothDivider → charcoal (inside Trust)
+ *   Contact          (charcoal)     — no divider (last section)
+ */
 export default function Home() {
   return (
     <>
       <Navbar />
 
       <main className="overflow-x-hidden">
-        {/* ══════════════════════════════════════════════════════
-            Section Color Map (for divider reference):
-            Hero:             charcoal
-            Story:            charcoal
-            Brand Carousel 1: warm-white
-            Services:         warm-white
-            Technology:       charcoal
-            Brand Carousel 2: warm-white
-            Stats:            charcoal
-            Trust:            warm-white
-            Contact:          charcoal
-        ══════════════════════════════════════════════════════ */}
-
         <HeroSection />
 
-        {/* Hero (charcoal) → Story (charcoal): same bg, no divider needed */}
-
+        {/* Hero (charcoal) → Story (charcoal): same bg, no divider */}
         <StorySection />
 
-        {/* Story (charcoal) → Brand Carousel (warm-white): wave transition */}
-        <WaveDivider
-          topColor="var(--color-charcoal)"
-          bottomColor="var(--color-warm-white)"
-        />
-
-        {/* Brand Carousel #1 — Repuestos */}
+        {/* Story has WaveDivider inside → Brand Carousel */}
         <div className="bg-warm-white px-4 py-8 md:py-12">
           <div className="mx-auto max-w-6xl">
             <p className="mb-5 text-center text-xs font-semibold uppercase tracking-[0.3em] text-text-muted">
@@ -84,56 +72,31 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Brand Carousel (warm-white) → Services (warm-white): same bg, no divider */}
-
+        {/* Brand Carousel (warm-white) → Services (warm-white): same bg */}
         <ServicesSection />
 
-        {/* Services (warm-white) → Technology (charcoal): gear tooth */}
-        <GearToothDivider
-          topColor="var(--color-warm-white)"
-          bottomColor="var(--color-charcoal)"
-        />
-
+        {/* Services has GearToothDivider inside → Technology */}
         <TechnologySection />
 
-        {/* Technology (charcoal) → Brand Carousel (warm-white): wave */}
-        <WaveDivider
-          topColor="var(--color-charcoal)"
-          bottomColor="var(--color-warm-white)"
-        />
-
-        {/* Brand Carousel #2 — Vehículos */}
-        <div className="bg-warm-white px-4 py-8 md:py-12">
+        {/* Technology has WaveDivider inside → Brand Carousel 2 */}
+        <div className="relative overflow-hidden bg-warm-white px-4 pb-28 pt-8 md:pb-36 md:pt-12">
           <div className="mx-auto max-w-6xl">
             <p className="mb-5 text-center text-xs font-semibold uppercase tracking-[0.3em] text-text-muted">
               Marcas de vehículos que atendemos
             </p>
             <BrandCarousel brands={VEHICLE_BRANDS} direction="right" speed="normal" />
           </div>
+          {/* Shaped transition to Stats (charcoal) */}
+          <AngleDivider fill="var(--color-charcoal)" />
         </div>
 
-        {/* Brand Carousel (warm-white) → Stats (charcoal): angle cut */}
-        <AngleDivider
-          topColor="var(--color-warm-white)"
-          bottomColor="var(--color-charcoal)"
-        />
-
+        {/* Brand Carousel has AngleDivider inside → Stats */}
         <StatsSection />
 
-        {/* Stats (charcoal) → Trust (warm-white): double wave */}
-        <DoubleWaveDivider
-          topColor="var(--color-charcoal)"
-          bottomColor="var(--color-warm-white)"
-        />
-
+        {/* Stats has DoubleWaveDivider inside → Trust */}
         <TrustSection />
 
-        {/* Trust (warm-white) → Contact (charcoal): gear tooth */}
-        <GearToothDivider
-          topColor="var(--color-warm-white)"
-          bottomColor="var(--color-charcoal)"
-        />
-
+        {/* Trust has GearToothDivider inside → Contact */}
         <ContactSection />
       </main>
 

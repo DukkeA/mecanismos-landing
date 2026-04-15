@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { DURATION, EASE, prefersReducedMotion } from "@/lib/animations";
 import { gsap, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
+import { GearToothDivider } from "@/components/svg/SectionDividers";
 
 registerGSAPPlugins();
 
@@ -103,7 +104,7 @@ export function TrustSection({ id = "trust" }: TrustSectionProps) {
     <section
       id={id}
       ref={containerRef}
-      className="noise-overlay relative overflow-hidden bg-warm-white py-28 md:py-40"
+      className="noise-overlay relative overflow-hidden bg-warm-white pb-32 pt-28 md:pb-44 md:pt-40"
     >
       {/* Subtle diagonal accent */}
       <div className="absolute inset-0 bg-[linear-gradient(160deg,_transparent_30%,_rgba(201,169,110,0.03)_30%,_rgba(201,169,110,0.03)_70%,_transparent_70%)]" />
@@ -214,6 +215,9 @@ export function TrustSection({ id = "trust" }: TrustSectionProps) {
           </a>
         </div>
       </div>
+
+      {/* Shaped transition to Contact section (charcoal) */}
+      <GearToothDivider fill="var(--color-charcoal)" />
     </section>
   );
 }

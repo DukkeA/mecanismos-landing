@@ -4,6 +4,7 @@ import { useRef } from "react";
 import Image from "next/image";
 import { DURATION, EASE, SCROLL_DEFAULTS, prefersReducedMotion } from "@/lib/animations";
 import { gsap, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
+import { GearToothDivider } from "@/components/svg/SectionDividers";
 
 registerGSAPPlugins();
 
@@ -81,7 +82,7 @@ export function ServicesSection({ id = "servicios" }: { id?: string }) {
     <section
       id={id}
       ref={containerRef}
-      className="noise-overlay relative overflow-hidden bg-warm-white py-24 md:py-36"
+      className="noise-overlay relative overflow-hidden bg-warm-white pb-32 pt-24 md:pb-44 md:pt-36"
     >
       {/* Subtle diagonal background accent */}
       <div className="absolute inset-0 bg-[linear-gradient(135deg,_transparent_40%,_rgba(201,169,110,0.04)_40%,_rgba(201,169,110,0.04)_60%,_transparent_60%)]" />
@@ -166,6 +167,9 @@ export function ServicesSection({ id = "servicios" }: { id?: string }) {
           })}
         </div>
       </div>
+
+      {/* Shaped transition to Technology section (charcoal) */}
+      <GearToothDivider fill="var(--color-charcoal)" />
     </section>
   );
 }

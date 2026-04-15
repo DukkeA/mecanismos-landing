@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import Image from "next/image";
 import { GearSVG } from "@/components/svg/GearSVG";
+import { WaveDivider } from "@/components/svg/SectionDividers";
 import { prefersReducedMotion } from "@/lib/animations";
 import { gsap, ScrollTrigger, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
 
@@ -229,6 +230,9 @@ export function StorySection({ id = "historia" }: { id?: string }) {
           </div>
         ))}
       </div>
+
+      {/* Shaped transition to next section (warm-white) */}
+      <WaveDivider fill="var(--color-warm-white)" />
     </section>
   );
 }

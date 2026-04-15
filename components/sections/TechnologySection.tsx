@@ -4,6 +4,7 @@ import { useRef } from "react";
 import Image from "next/image";
 import { DURATION, EASE, SCROLL_DEFAULTS, prefersReducedMotion } from "@/lib/animations";
 import { gsap, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
+import { WaveDivider } from "@/components/svg/SectionDividers";
 
 registerGSAPPlugins();
 
@@ -145,6 +146,9 @@ export function TechnologySection({ id = "tecnologia" }: { id?: string }) {
           </p>
         </div>
       </div>
+
+      {/* Shaped transition to Brand Carousel (warm-white) */}
+      <WaveDivider fill="var(--color-warm-white)" />
     </section>
   );
 }

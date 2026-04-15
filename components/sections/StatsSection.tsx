@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { StatCounter } from "@/components/ui/StatCounter";
 import { DURATION, EASE, prefersReducedMotion } from "@/lib/animations";
 import { gsap, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
+import { DoubleWaveDivider } from "@/components/svg/SectionDividers";
 
 registerGSAPPlugins();
 
@@ -99,7 +100,7 @@ export function StatsSection({ id = "stats" }: StatsSectionProps) {
     <section
       id={id}
       ref={containerRef}
-      className="noise-overlay relative overflow-hidden py-28 md:py-40"
+      className="noise-overlay relative overflow-hidden pb-36 pt-28 md:pb-48 md:pt-40"
     >
       {/* ── Multi-layer background ── */}
       <div className="absolute inset-0 bg-charcoal" />
@@ -182,6 +183,9 @@ export function StatsSection({ id = "stats" }: StatsSectionProps) {
         {/* Decorative separator */}
         <div className="mx-auto mt-20 h-px w-full max-w-4xl bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
       </div>
+
+      {/* Shaped transition to Trust section (warm-white) */}
+      <DoubleWaveDivider fill="var(--color-warm-white)" />
     </section>
   );
 }
