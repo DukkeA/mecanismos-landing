@@ -62,35 +62,32 @@ export default function Home() {
             Contact:          charcoal
         ══════════════════════════════════════════════════════ */}
 
-        {/* Wrapper ensures charcoal always backs the wave-clip zone
-             between Hero and Story — prevents body white bleeding through */}
-        <div className="bg-charcoal">
+        {/* Wrapper ensures charcoal always backs the wave-clip zones
+             between Hero ↔ Story ↔ Services — prevents body white bleeding
+             through the clip-path cutouts */}
+        <div className="bg-charcoal pb-16 md:pb-20">
           <HeroSection />
 
           {/* Hero (charcoal) → Story (charcoal): wave clip mask on Story top */}
 
           <StorySection />
+
+          {/* Story (charcoal) → Services (warm-white): wave clip mask on Services top.
+              Services sits inside the charcoal wrapper so the clip reveals real
+              charcoal behind the wave — same technique as Hero → Story.
+              Brand Carousel #1 lives inside Services for shared background. */}
+
+          <ServicesSection
+            brandCarousel={
+              <>
+                <p className="mb-5 text-center text-xs font-semibold uppercase tracking-[0.3em] text-text-muted">
+                  Marcas de repuestos con las que trabajamos
+                </p>
+                <BrandCarousel brands={PARTS_BRANDS} direction="left" speed="slow" />
+              </>
+            }
+          />
         </div>
-
-        {/* Story (charcoal) → Brand Carousel (warm-white): wave transition */}
-        <WaveDivider
-          topColor="var(--color-charcoal)"
-          bottomColor="var(--color-warm-white)"
-        />
-
-        {/* Brand Carousel #1 — Repuestos */}
-        <div className="bg-warm-white px-4 py-8 md:py-12">
-          <div className="mx-auto max-w-6xl">
-            <p className="mb-5 text-center text-xs font-semibold uppercase tracking-[0.3em] text-text-muted">
-              Marcas de repuestos con las que trabajamos
-            </p>
-            <BrandCarousel brands={PARTS_BRANDS} direction="left" speed="slow" />
-          </div>
-        </div>
-
-        {/* Brand Carousel (warm-white) → Services (warm-white): same bg, no divider */}
-
-        <ServicesSection />
 
         {/* Services (warm-white) → Technology (charcoal): gear tooth */}
         <GearToothDivider

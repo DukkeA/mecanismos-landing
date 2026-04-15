@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, type ReactNode } from "react";
 import Image from "next/image";
 import { DURATION, EASE, SCROLL_DEFAULTS, prefersReducedMotion } from "@/lib/animations";
 import { gsap, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
@@ -40,7 +40,13 @@ const services = [
   },
 ] as const;
 
-export function ServicesSection({ id = "servicios" }: { id?: string }) {
+export function ServicesSection({
+  id = "servicios",
+  brandCarousel,
+}: {
+  id?: string;
+  brandCarousel?: ReactNode;
+}) {
   const containerRef = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -81,10 +87,28 @@ export function ServicesSection({ id = "servicios" }: { id?: string }) {
     <section
       id={id}
       ref={containerRef}
-      className="noise-overlay relative overflow-hidden bg-warm-white py-24 md:py-36"
+      className="services-section-clip noise-overlay relative bg-warm-white py-24 md:py-36"
     >
+      {/* Inline SVG clipPath for the wave-cut top edge.
+          Uses objectBoundingBox units — wave peaks at ~6% like Hero → Story. */}
+      <svg width="0" height="0" aria-hidden="true" className="absolute">
+        <defs>
+          <clipPath id="wave-clip-story-services" clipPathUnits="objectBoundingBox">
+            <path d="M0,0.06 C0.15,0 0.3,0.08 0.5,0.04 C0.7,0 0.85,0.08 1,0.03 L1,1 L0,1 Z" />
+          </clipPath>
+        </defs>
+      </svg>
+
       {/* Subtle diagonal background accent */}
       <div className="absolute inset-0 bg-[linear-gradient(135deg,_transparent_40%,_rgba(201,169,110,0.04)_40%,_rgba(201,169,110,0.04)_60%,_transparent_60%)]" />
+
+      {/* Brand carousel sits above the services content, inside the same
+          section so it inherits the diagonal gradient + noise overlay. */}
+      {brandCarousel && (
+        <div className="relative z-10 mb-16 w-full md:mb-20">
+          {brandCarousel}
+        </div>
+      )}
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 md:px-10">
         {/* Header */}

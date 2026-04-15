@@ -238,6 +238,21 @@ html {
   }
 }
 
+/* Wave clip on Brand Carousel #1 → Services — overlaps Story charcoal wrapper.
+   Services is tall enough for objectBoundingBox to produce a visible wave. */
+.services-section-clip {
+  position: relative;
+  margin-top: -60px;
+  clip-path: url(#wave-clip-story-services);
+  z-index: 2;
+}
+
+@media (min-width: 768px) {
+  .services-section-clip {
+    margin-top: -80px;
+  }
+}
+
 .horizontal-scroll-track {
   display: flex;
   width: max-content;
