@@ -49,15 +49,30 @@ export default function Home() {
       <Navbar />
 
       <main className="overflow-x-hidden">
+        {/* ══════════════════════════════════════════════════════
+            Section Color Map (for divider reference):
+            Hero:             charcoal
+            Story:            charcoal
+            Brand Carousel 1: warm-white
+            Services:         warm-white
+            Technology:       charcoal
+            Brand Carousel 2: warm-white
+            Stats:            charcoal
+            Trust:            warm-white
+            Contact:          charcoal
+        ══════════════════════════════════════════════════════ */}
+
         <HeroSection />
 
-        {/* Hero → Story: organic wave transition */}
-        <WaveDivider fill="var(--color-warm-white)" className="-mt-1 bg-charcoal" />
+        {/* Hero (charcoal) → Story (charcoal): same bg, no divider needed */}
 
         <StorySection />
 
-        {/* Story → Brand Carousel: angle cut */}
-        <AngleDivider fill="var(--color-warm-white)" className="-mt-1 bg-charcoal" />
+        {/* Story (charcoal) → Brand Carousel (warm-white): wave transition */}
+        <WaveDivider
+          topColor="var(--color-charcoal)"
+          bottomColor="var(--color-warm-white)"
+        />
 
         {/* Brand Carousel #1 — Repuestos */}
         <div className="bg-warm-white px-4 py-8 md:py-12">
@@ -69,15 +84,23 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Brand Carousel (warm-white) → Services (warm-white): same bg, no divider */}
+
         <ServicesSection />
 
-        {/* Services → Technology: gear tooth (mechanical feel) */}
-        <GearToothDivider fill="var(--color-charcoal)" className="-mb-1 bg-warm-white" />
+        {/* Services (warm-white) → Technology (charcoal): gear tooth */}
+        <GearToothDivider
+          topColor="var(--color-warm-white)"
+          bottomColor="var(--color-charcoal)"
+        />
 
         <TechnologySection />
 
-        {/* Technology → Brand Carousel: wave transition */}
-        <WaveDivider fill="var(--color-warm-white)" className="-mt-1 bg-charcoal" />
+        {/* Technology (charcoal) → Brand Carousel (warm-white): wave */}
+        <WaveDivider
+          topColor="var(--color-charcoal)"
+          bottomColor="var(--color-warm-white)"
+        />
 
         {/* Brand Carousel #2 — Vehículos */}
         <div className="bg-warm-white px-4 py-8 md:py-12">
@@ -89,18 +112,27 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Brand Carousel → Stats: angle cut to dark section */}
-        <AngleDivider fill="var(--color-charcoal)" className="-mb-1 bg-warm-white" />
+        {/* Brand Carousel (warm-white) → Stats (charcoal): angle cut */}
+        <AngleDivider
+          topColor="var(--color-warm-white)"
+          bottomColor="var(--color-charcoal)"
+        />
 
         <StatsSection />
 
-        {/* Stats → Trust: double wave (dark to light) */}
-        <DoubleWaveDivider fill="var(--color-warm-white)" className="-mt-1 bg-charcoal" />
+        {/* Stats (charcoal) → Trust (warm-white): double wave */}
+        <DoubleWaveDivider
+          topColor="var(--color-charcoal)"
+          bottomColor="var(--color-warm-white)"
+        />
 
         <TrustSection />
 
-        {/* Trust → Contact: gear tooth (light to dark) */}
-        <GearToothDivider fill="var(--color-charcoal)" className="-mb-1 bg-warm-white" />
+        {/* Trust (warm-white) → Contact (charcoal): gear tooth */}
+        <GearToothDivider
+          topColor="var(--color-warm-white)"
+          bottomColor="var(--color-charcoal)"
+        />
 
         <ContactSection />
       </main>
