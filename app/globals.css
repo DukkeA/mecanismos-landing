@@ -238,21 +238,6 @@ html {
   }
 }
 
-/* Wave clip on Services — overlaps Story charcoal wrapper.
-   References the SVG clipPath defined in layout.tsx (server component)
-   so the browser can resolve it reliably. */
-.services-section-clip {
-  position: relative;
-  margin-top: -60px;
-  clip-path: url(#wave-clip-story-services);
-  z-index: 2;
-}
-
-@media (min-width: 768px) {
-  .services-section-clip {
-    margin-top: -80px;
-  }
-}
 
 .horizontal-scroll-track {
   display: flex;

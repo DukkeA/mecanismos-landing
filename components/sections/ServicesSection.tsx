@@ -4,6 +4,7 @@ import { useRef, type ReactNode } from "react";
 import Image from "next/image";
 import { DURATION, EASE, SCROLL_DEFAULTS, prefersReducedMotion } from "@/lib/animations";
 import { gsap, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
+import { StoryServicesDivider } from "@/components/svg/story-services-divider";
 
 registerGSAPPlugins();
 
@@ -87,8 +88,10 @@ export function ServicesSection({
     <section
       id={id}
       ref={containerRef}
-      className="services-section-clip noise-overlay relative bg-warm-white py-24 md:py-36"
+      className="noise-overlay relative z-2 -mt-20 bg-warm-white pt-28 pb-24 md:-mt-[120px] md:pt-44 md:pb-36"
     >
+      {/* Wave divider: charcoal waves flowing down over warm-white, fusing with Story above */}
+      <StoryServicesDivider />
 
       {/* Subtle diagonal background accent */}
       <div className="absolute inset-0 bg-[linear-gradient(135deg,_transparent_40%,_rgba(201,169,110,0.04)_40%,_rgba(201,169,110,0.04)_60%,_transparent_60%)]" />

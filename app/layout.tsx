@@ -34,8 +34,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen">
         {/* Global SVG clipPath definitions — placed in the server-rendered layout
-            so every client component can reference them via clip-path: url(#id).
-            Inline SVG clipPaths inside client components fail to resolve. */}
+            so every client component can reference them via clip-path: url(#id). */}
         <svg
           width="0"
           height="0"
@@ -43,13 +42,7 @@ export default function RootLayout({
           style={{ position: "absolute" }}
         >
           <defs>
-            {/* Wave used for Story → Services transition */}
-            <clipPath
-              id="wave-clip-story-services"
-              clipPathUnits="objectBoundingBox"
-            >
-              <path d="M0,0.06 C0.15,0 0.3,0.08 0.5,0.04 C0.7,0 0.85,0.08 1,0.03 L1,1 L0,1 Z" />
-            </clipPath>
+            {/* Reserved for future global clipPaths */}
           </defs>
         </svg>
         {children}

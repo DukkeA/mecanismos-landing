@@ -62,32 +62,28 @@ export default function Home() {
             Contact:          charcoal
         ══════════════════════════════════════════════════════ */}
 
-        {/* Wrapper ensures charcoal always backs the wave-clip zones
-             between Hero ↔ Story ↔ Services — prevents body white bleeding
-             through the clip-path cutouts */}
-        <div className="bg-charcoal pb-16 md:pb-20">
+        {/* Wrapper ensures charcoal backs the Hero ↔ Story zone */}
+        <div className="relative bg-charcoal">
           <HeroSection />
 
           {/* Hero (charcoal) → Story (charcoal): wave clip mask on Story top */}
 
           <StorySection />
-
-          {/* Story (charcoal) → Services (warm-white): wave clip mask on Services top.
-              Services sits inside the charcoal wrapper so the clip reveals real
-              charcoal behind the wave — same technique as Hero → Story.
-              Brand Carousel #1 lives inside Services for shared background. */}
-
-          <ServicesSection
-            brandCarousel={
-              <>
-                <p className="mb-5 text-center text-xs font-semibold uppercase tracking-[0.3em] text-text-muted">
-                  Marcas de repuestos con las que trabajamos
-                </p>
-                <BrandCarousel brands={PARTS_BRANDS} direction="left" speed="slow" />
-              </>
-            }
-          />
         </div>
+
+        {/* Services section — Brand Carousel #1 lives inside for shared bg.
+            Wave divider renders inside Services at the top (absolute). */}
+
+        <ServicesSection
+          brandCarousel={
+            <>
+              <p className="mb-5 text-center text-xs font-semibold uppercase tracking-[0.3em] text-text-muted">
+                Marcas de repuestos con las que trabajamos
+              </p>
+              <BrandCarousel brands={PARTS_BRANDS} direction="left" speed="slow" />
+            </>
+          }
+        />
 
         {/* Services (warm-white) → Technology (charcoal): gear tooth */}
         <GearToothDivider
