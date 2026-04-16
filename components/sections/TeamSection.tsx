@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState, type RefObject } from "react";
 import Image from "next/image";
+import { AnimatePresence, motion } from "motion/react";
 import { BrandCarousel } from "@/components/ui/BrandCarousel";
 import { prefersReducedMotion } from "@/lib/animations";
 import { gsap, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
@@ -35,7 +36,7 @@ type TeamMember = {
   metricLabel: string;
   image: string;
   label: string;
-  desktopPosition: string;
+  collageClass: string;
 };
 
 const INTRO_SCENES: readonly IntroScene[] = [
@@ -81,7 +82,7 @@ const TEAM_MEMBERS: readonly TeamMember[] = [
     image:
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=1200&q=80&auto=format&fit=crop",
     label: "Retrato ficcional de Luis Alfredo Duque",
-    desktopPosition: "left-[4%] top-[10%] w-[28%] aspect-[0.82]",
+    collageClass: "col-start-1 row-start-1 col-span-5 row-span-4",
   },
   {
     id: "arabella",
@@ -96,7 +97,7 @@ const TEAM_MEMBERS: readonly TeamMember[] = [
     image:
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=1200&q=80&auto=format&fit=crop",
     label: "Retrato ficcional de Arabella Cadena",
-    desktopPosition: "left-[36%] top-[2%] w-[24%] aspect-[0.76]",
+    collageClass: "col-start-6 row-start-1 col-span-4 row-span-3",
   },
   {
     id: "mateo",
@@ -111,7 +112,7 @@ const TEAM_MEMBERS: readonly TeamMember[] = [
     image:
       "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=1200&q=80&auto=format&fit=crop",
     label: "Retrato ficcional de Mateo Rincón",
-    desktopPosition: "right-[8%] top-[12%] w-[22%] aspect-[0.82]",
+    collageClass: "col-start-10 row-start-1 col-span-3 row-span-3",
   },
   {
     id: "salome",
@@ -126,7 +127,7 @@ const TEAM_MEMBERS: readonly TeamMember[] = [
     image:
       "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=1200&q=80&auto=format&fit=crop",
     label: "Retrato ficcional de Salomé Varela",
-    desktopPosition: "left-[11%] bottom-[12%] w-[23%] aspect-[0.8]",
+    collageClass: "col-start-1 row-start-5 col-span-5 row-span-3",
   },
   {
     id: "samuel",
@@ -141,7 +142,7 @@ const TEAM_MEMBERS: readonly TeamMember[] = [
     image:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&q=80&auto=format&fit=crop",
     label: "Retrato ficcional de Samuel Cárdenas",
-    desktopPosition: "left-[41%] bottom-[4%] w-[26%] aspect-[0.78]",
+    collageClass: "col-start-6 row-start-4 col-span-4 row-span-4",
   },
   {
     id: "clara",
@@ -156,11 +157,35 @@ const TEAM_MEMBERS: readonly TeamMember[] = [
     image:
       "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=1200&q=80&auto=format&fit=crop",
     label: "Retrato ficcional de Clara Villamil",
-    desktopPosition: "right-[4%] bottom-[14%] w-[24%] aspect-[0.84]",
+    collageClass: "col-start-10 row-start-4 col-span-3 row-span-4",
   },
 ] as const;
 
 const TEAM_STEPS = ["Fundador", "Fundadora", "Equipo interactivo"] as const;
+
+type TeamFlightRect = {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+};
+
+type TeamMemberFlight = {
+  memberId: string;
+  startRect: TeamFlightRect;
+  endRect: TeamFlightRect;
+};
+
+function getRectSnapshot(element: HTMLElement): TeamFlightRect {
+  const rect = element.getBoundingClientRect();
+
+  return {
+    top: rect.top,
+    left: rect.left,
+    width: rect.width,
+    height: rect.height,
+  };
+}
 
 interface TeamSectionProps {
   id?: string;
@@ -169,12 +194,54 @@ interface TeamSectionProps {
 
 export function TeamSection({ id = "equipo", vehicleBrands }: TeamSectionProps) {
   const [activeMemberId, setActiveMemberId] = useState(TEAM_MEMBERS[0].id);
+  const [memberFlight, setMemberFlight] = useState<TeamMemberFlight | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
-  const detailRef = useRef<HTMLDivElement>(null);
+  const detailVisualSlotRef = useRef<HTMLDivElement>(null);
+  const collageVisualRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const activeMember =
     TEAM_MEMBERS.find((member) => member.id === activeMemberId) ?? TEAM_MEMBERS[0];
+
+  const registerCollageVisual = useCallback(
+    (memberId: string) => (node: HTMLDivElement | null) => {
+      collageVisualRefs.current[memberId] = node;
+    },
+    [],
+  );
+
+  const handleSelectMember = useCallback(
+    (memberId: string) => {
+      if (memberId === activeMemberId || memberFlight) return;
+
+      if (prefersReducedMotion()) {
+        setActiveMemberId(memberId);
+        return;
+      }
+
+      const sourceVisual = collageVisualRefs.current[memberId];
+      const targetVisual = detailVisualSlotRef.current;
+
+      if (!sourceVisual || !targetVisual) {
+        setActiveMemberId(memberId);
+        return;
+      }
+
+      setMemberFlight({
+        memberId,
+        startRect: getRectSnapshot(sourceVisual),
+        endRect: getRectSnapshot(targetVisual),
+      });
+    },
+    [activeMemberId, memberFlight],
+  );
+
+  const finishMemberFlight = useCallback(() => {
+    if (!memberFlight) return;
+
+    setActiveMemberId(memberFlight.memberId);
+    setMemberFlight(null);
+  }, [memberFlight]);
 
   useGSAP(
     () => {
@@ -190,9 +257,6 @@ export function TeamSection({ id = "equipo", vehicleBrands }: TeamSectionProps) 
       );
       const collageScene = stage.querySelector<HTMLElement>("[data-team-collage-scene]");
       const collageCards = gsap.utils.toArray<HTMLElement>("[data-team-member-card]");
-      const collageToggles = gsap.utils.toArray<HTMLElement>(
-        "[data-team-member-toggle]",
-      );
 
       if (
         introScenes.length !== INTRO_SCENES.length ||
@@ -220,7 +284,7 @@ export function TeamSection({ id = "equipo", vehicleBrands }: TeamSectionProps) 
         scale: 0.96,
         transformOrigin: "center center",
       });
-      gsap.set([...collageCards, ...collageToggles], { autoAlpha: 0, y: 24 });
+      gsap.set(collageCards, { autoAlpha: 0, y: 24 });
 
       gsap.set(progressFills, {
         scaleX: 0,
@@ -252,38 +316,9 @@ export function TeamSection({ id = "equipo", vehicleBrands }: TeamSectionProps) 
         .to(introScenes[1], { autoAlpha: 0, ease: "none" }, 1.44)
         .to(collageScene, { autoAlpha: 1, y: 0, scale: 1, ease: "none" }, 1.44)
         .to(progressFills[2], { scaleX: 1, ease: "none" }, 1.58)
-        .to(collageCards, { autoAlpha: 1, y: 0, stagger: 0.05, ease: "none" }, 1.62)
-        .to(
-          collageToggles,
-          { autoAlpha: 1, y: 0, stagger: 0.04, ease: "none" },
-          1.72,
-        );
+        .to(collageCards, { autoAlpha: 1, y: 0, stagger: 0.05, ease: "none" }, 1.62);
     },
     { scope: sectionRef },
-  );
-
-  useGSAP(
-    () => {
-      const detail = detailRef.current;
-      if (!detail) return;
-
-      gsap.fromTo(
-        detail.querySelectorAll("[data-team-detail-animate]"),
-        { autoAlpha: 0, y: 18 },
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: prefersReducedMotion() ? 0.01 : 0.5,
-          stagger: prefersReducedMotion() ? 0 : 0.06,
-          ease: "power2.out",
-        },
-      );
-    },
-    {
-      scope: detailRef,
-      dependencies: [activeMemberId],
-      revertOnUpdate: true,
-    },
   );
 
   return (
@@ -313,11 +348,11 @@ export function TeamSection({ id = "equipo", vehicleBrands }: TeamSectionProps) 
             </p>
             <h2 className="mt-4 text-3xl font-bold tracking-tight text-charcoal md:text-5xl lg:text-6xl">
               Del oficio fundador al <span className="text-gradient-gold">sistema humano</span>
-            </h2>
-            <p className="mt-4 max-w-lg text-sm leading-relaxed text-text-muted md:text-base">
-              Primero ves a quienes trazaron el estándar. Después, el taller se abre como una constelación interactiva donde cada perfil ocupa un rol visible.
-            </p>
-          </div>
+             </h2>
+             <p className="mt-4 max-w-lg text-sm leading-relaxed text-text-muted md:text-base">
+               Primero ves a quienes trazaron el estándar. Después, el taller se abre como un mural interactivo donde cada perfil salta del collage hacia su lectura detallada.
+             </p>
+           </div>
 
           <div className="grid gap-3 text-[0.7rem] uppercase tracking-[0.28em] text-charcoal/55 md:min-w-[19rem]">
             {TEAM_STEPS.map((step, index) => (
@@ -395,181 +430,38 @@ export function TeamSection({ id = "equipo", vehicleBrands }: TeamSectionProps) 
 
           <div className="relative z-20 mx-auto grid h-full max-w-7xl items-center gap-8 px-6 pb-16 pt-40 md:px-10 md:pt-36 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] lg:gap-14 xl:gap-[4.5rem]">
             <div className="order-1">
-              <div className="md:hidden">
-                <div className="grid grid-cols-2 gap-3">
-                  {TEAM_MEMBERS.map((member) => {
-                    const isActive = member.id === activeMember.id;
-
-                    return (
-                      <button
-                        key={member.id}
-                        type="button"
-                        data-team-member-card
-                        onClick={() => setActiveMemberId(member.id)}
-                        className={`relative min-h-[10rem] overflow-hidden rounded-[1.5rem] border text-left transition-all duration-500 ${
-                          isActive
-                            ? "border-gold/50 shadow-[0_24px_80px_-40px_rgba(201,169,110,0.55)]"
-                            : "border-charcoal/10 opacity-85 hover:opacity-100"
-                        }`}
-                      >
-                        <Image
-                          alt={member.label}
-                          className={`object-cover transition-transform duration-500 ${
-                            isActive ? "scale-105" : "scale-100"
-                          }`}
-                          fill
-                          sizes="50vw"
-                          src={member.image}
-                        />
-                        <div className={`absolute inset-0 transition-colors duration-500 ${isActive ? "bg-gradient-to-t from-charcoal/55 via-transparent to-transparent" : "bg-charcoal/35"}`} />
-                        <div className="absolute inset-x-0 bottom-0 p-3">
-                          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-pure-white/85">
-                            {member.name}
-                          </p>
-                          <p className="mt-1 text-[0.62rem] uppercase tracking-[0.22em] text-pure-white/60">
-                            {member.role}
-                          </p>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="relative hidden h-[68vh] min-h-[30rem] rounded-[2.75rem] border border-charcoal/10 bg-[linear-gradient(180deg,_rgba(255,255,255,0.64),_rgba(255,255,255,0.28))] p-4 shadow-[0_55px_140px_-80px_rgba(45,45,45,0.38)] backdrop-blur-xl md:block">
-                <div className="absolute inset-6 rounded-[2.4rem] border border-charcoal/8" />
-
-                {TEAM_MEMBERS.map((member) => {
-                  const isActive = member.id === activeMember.id;
-
-                  return (
-                    <button
-                      key={member.id}
-                      type="button"
-                      data-team-member-card
-                      onClick={() => setActiveMemberId(member.id)}
-                      className={`absolute overflow-hidden rounded-[1.85rem] border text-left transition-all duration-500 ${member.desktopPosition} ${
-                        isActive
-                          ? "z-20 scale-[1.05] border-gold/55 shadow-[0_32px_95px_-45px_rgba(201,169,110,0.65)]"
-                          : "z-10 border-charcoal/10 opacity-80 hover:-translate-y-1 hover:opacity-100 hover:border-gold/35"
-                      }`}
-                    >
-                      <Image
-                        alt={member.label}
-                        className={`object-cover transition-transform duration-500 ${
-                          isActive ? "scale-105" : "scale-100"
-                        }`}
-                        fill
-                        sizes="(max-width: 1280px) 22vw, 18vw"
-                        src={member.image}
-                      />
-                      <div className={`absolute inset-0 transition-colors duration-500 ${isActive ? "bg-[linear-gradient(180deg,_rgba(45,45,45,0.08),_rgba(45,45,45,0.58))]" : "bg-[linear-gradient(180deg,_rgba(45,45,45,0.24),_rgba(45,45,45,0.62))]"}`} />
-                      <div className="absolute inset-x-0 bottom-0 p-4">
-                        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-pure-white/80">
-                          {member.name}
-                        </p>
-                        <p className="mt-1 text-[0.62rem] uppercase tracking-[0.22em] text-pure-white/58">
-                          {member.specialty}
-                        </p>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+              <TeamCollage
+                activeMemberId={activeMember.id}
+                flightMemberId={memberFlight?.memberId ?? null}
+                enableRevealData
+                onSelectMember={handleSelectMember}
+                registerVisual={registerCollageVisual}
+              />
             </div>
 
             <div className="order-2">
-              <div className="rounded-[2rem] border border-charcoal/10 bg-pure-white/76 p-6 shadow-[0_40px_120px_-70px_rgba(45,45,45,0.38)] backdrop-blur-xl md:p-8 lg:p-10">
-                <div ref={detailRef}>
-                  <div key={activeMember.id} className="space-y-5">
-                    <p
-                      data-team-detail-animate
-                      className="text-xs font-semibold uppercase tracking-[0.28em] text-gold"
-                    >
-                      Miembro destacado
-                    </p>
-                    <div data-team-detail-animate>
-                      <h3 className="text-3xl font-bold tracking-tight text-charcoal md:text-5xl">
-                        {activeMember.name}
-                      </h3>
-                      <p className="mt-3 text-sm font-semibold uppercase tracking-[0.24em] text-charcoal/55 md:text-[0.78rem]">
-                        {activeMember.role}
-                      </p>
-                    </div>
-                    <p
-                      data-team-detail-animate
-                      className="text-xl leading-snug text-charcoal md:text-2xl"
-                    >
-                      {activeMember.specialty}
-                    </p>
-                    <p
-                      data-team-detail-animate
-                      className="text-base leading-relaxed text-text-muted md:text-lg"
-                    >
-                      {activeMember.bio}
-                    </p>
-
-                    <div className="grid gap-3 sm:grid-cols-[auto_1fr]">
-                      <div
-                        data-team-detail-animate
-                        className="rounded-[1.5rem] border border-charcoal/10 bg-warm-white/80 px-5 py-4"
-                      >
-                        <p className="text-3xl font-bold tracking-tight text-gold md:text-4xl">
-                          {activeMember.metric}
-                        </p>
-                        <p className="mt-1 text-[0.68rem] uppercase tracking-[0.24em] text-text-muted">
-                          {activeMember.metricLabel}
-                        </p>
-                      </div>
-                      <blockquote
-                        data-team-detail-animate
-                        className="rounded-[1.5rem] border border-charcoal/10 px-5 py-4 text-sm leading-relaxed text-charcoal/75 md:text-base"
-                      >
-                        “{activeMember.quote}”
-                      </blockquote>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-8 space-y-3 border-t border-charcoal/10 pt-6">
-                  <p className="text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-charcoal/45">
-                    Seleccioná un perfil
-                  </p>
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    {TEAM_MEMBERS.map((member) => {
-                      const isActive = member.id === activeMember.id;
-
-                      return (
-                        <button
-                          key={member.id}
-                          type="button"
-                          data-team-member-toggle
-                          aria-pressed={isActive}
-                          onClick={() => setActiveMemberId(member.id)}
-                          className={`rounded-[1.25rem] border px-4 py-3 text-left transition-all duration-300 ${
-                            isActive
-                              ? "border-charcoal bg-charcoal text-pure-white shadow-[0_20px_50px_-35px_rgba(45,45,45,0.45)]"
-                              : "border-charcoal/10 bg-transparent text-charcoal hover:border-gold/45 hover:text-gold-dark"
-                          }`}
-                        >
-                          <p className="text-sm font-semibold uppercase tracking-[0.16em]">
-                            {member.name}
-                          </p>
-                          <p
-                            className={`mt-1 text-[0.68rem] uppercase tracking-[0.22em] ${
-                              isActive ? "text-pure-white/65" : "text-text-muted"
-                            }`}
-                          >
-                            {member.role}
-                          </p>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
+              <TeamDetailPanel
+                activeMember={activeMember}
+                enableMotion
+                hideVisual={Boolean(memberFlight)}
+                slotRef={detailVisualSlotRef}
+              />
             </div>
           </div>
+
+          <AnimatePresence>
+            {memberFlight ? (
+              <TeamMemberFlightOverlay
+                key={memberFlight.memberId}
+                member={
+                  TEAM_MEMBERS.find(({ id: memberId }) => memberId === memberFlight.memberId) ??
+                  activeMember
+                }
+                onComplete={finishMemberFlight}
+                rects={memberFlight}
+              />
+            ) : null}
+          </AnimatePresence>
         </article>
       </div>
 
@@ -618,64 +510,24 @@ export function TeamSection({ id = "equipo", vehicleBrands }: TeamSectionProps) 
               </article>
             ))}
 
-            <div className="rounded-[2.25rem] border border-charcoal/10 bg-pure-white/70 p-5 shadow-[0_30px_80px_-60px_rgba(45,45,45,0.35)] backdrop-blur-xl md:p-8 lg:col-span-2">
+            <div className="lg:col-span-2">
               <h3 className="text-2xl font-bold tracking-tight text-charcoal md:text-3xl">
                 Vista colectiva
               </h3>
               <p className="mt-3 max-w-3xl text-base leading-relaxed text-text-muted md:text-lg">
-                En modo de movimiento reducido dejamos el tercer acto como una composición interactiva estable: podés recorrer nombres y detalles sin el pin de scroll.
+                En modo de movimiento reducido dejamos el tercer acto como una composición estable: un mural más armónico a la izquierda y la lectura ampliada a la derecha, sin pin ni sobresaltos.
               </p>
 
               <div className="mt-8 grid gap-6 lg:grid-cols-[1.02fr_0.98fr]">
-                <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-                  {TEAM_MEMBERS.map((member) => {
-                    const isActive = member.id === activeMember.id;
-
-                    return (
-                      <button
-                        key={member.id}
-                        type="button"
-                        onClick={() => setActiveMemberId(member.id)}
-                        className={`relative min-h-[10rem] overflow-hidden rounded-[1.5rem] border text-left transition-all duration-300 ${
-                          isActive
-                            ? "border-gold/50 shadow-[0_24px_80px_-40px_rgba(201,169,110,0.55)]"
-                            : "border-charcoal/10"
-                        }`}
-                      >
-                        <Image
-                          alt={member.label}
-                          className="object-cover"
-                          fill
-                          sizes="(max-width: 768px) 50vw, 20vw"
-                          src={member.image}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-charcoal/65 to-transparent" />
-                        <div className="absolute inset-x-0 bottom-0 p-3">
-                          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-pure-white/80">
-                            {member.name}
-                          </p>
-                        </div>
-                      </button>
-                    );
-                  })}
+                <div>
+                  <TeamCollage
+                    activeMemberId={activeMember.id}
+                    onSelectMember={handleSelectMember}
+                  />
                 </div>
 
-                <div className="rounded-[1.75rem] border border-charcoal/10 bg-warm-white/75 p-5">
-                  <h4 className="text-2xl font-bold tracking-tight text-charcoal">
-                    {activeMember.name}
-                  </h4>
-                  <p className="mt-2 text-xs font-semibold uppercase tracking-[0.24em] text-charcoal/55">
-                    {activeMember.role}
-                  </p>
-                  <p className="mt-5 text-lg leading-snug text-charcoal">
-                    {activeMember.specialty}
-                  </p>
-                  <p className="mt-4 text-base leading-relaxed text-text-muted">
-                    {activeMember.bio}
-                  </p>
-                  <blockquote className="mt-5 text-sm leading-relaxed text-charcoal/75">
-                    “{activeMember.quote}”
-                  </blockquote>
+                <div>
+                  <TeamDetailPanel activeMember={activeMember} />
                 </div>
               </div>
             </div>
@@ -699,3 +551,351 @@ export function TeamSection({ id = "equipo", vehicleBrands }: TeamSectionProps) 
 }
 
 export default TeamSection;
+
+function TeamCollage({
+  activeMemberId,
+  flightMemberId,
+  onSelectMember,
+  registerVisual,
+  enableRevealData = false,
+}: Readonly<{
+  activeMemberId: string;
+  flightMemberId?: string | null;
+  onSelectMember: (memberId: string) => void;
+  registerVisual?: (memberId: string) => (node: HTMLDivElement | null) => void;
+  enableRevealData?: boolean;
+}>) {
+  return (
+    <>
+      <div className="md:hidden">
+        <div className="grid grid-cols-2 gap-3">
+          {TEAM_MEMBERS.map((member) => (
+            <TeamMemberCard
+              key={member.id}
+              className="min-h-[10.75rem]"
+              compact
+              enableRevealData={enableRevealData}
+              isInFlight={member.id === flightMemberId}
+              isActive={member.id === activeMemberId}
+              member={member}
+              onSelectMember={onSelectMember}
+              registerVisual={registerVisual}
+              sizes="50vw"
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="relative hidden md:block">
+        <div className="pointer-events-none absolute -left-8 top-6 h-40 w-40 rounded-full border border-gold/15" />
+        <div className="pointer-events-none absolute bottom-6 right-4 h-52 w-52 rounded-full border border-charcoal/10" />
+        <div className="pointer-events-none absolute inset-x-[8%] top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-transparent via-charcoal/10 to-transparent" />
+
+        <div className="grid h-[42rem] grid-cols-12 grid-rows-7 gap-4 xl:h-[44rem]">
+          {TEAM_MEMBERS.map((member) => (
+            <TeamMemberCard
+              key={member.id}
+              className={member.collageClass}
+              enableRevealData={enableRevealData}
+              isInFlight={member.id === flightMemberId}
+              isActive={member.id === activeMemberId}
+              member={member}
+              onSelectMember={onSelectMember}
+              registerVisual={registerVisual}
+              sizes="(max-width: 1280px) 22vw, 18vw"
+            />
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function TeamMemberCard({
+  member,
+  isActive,
+  onSelectMember,
+  sizes,
+  className,
+  compact = false,
+  isInFlight = false,
+  enableRevealData = false,
+  registerVisual,
+}: Readonly<{
+  member: TeamMember;
+  isActive: boolean;
+  onSelectMember: (memberId: string) => void;
+  sizes: string;
+  className: string;
+  compact?: boolean;
+  isInFlight?: boolean;
+  enableRevealData?: boolean;
+  registerVisual?: (memberId: string) => (node: HTMLDivElement | null) => void;
+}>) {
+  const frameClassName = compact ? "rounded-[1.55rem]" : "rounded-[1.9rem]";
+  const overlayClassName = compact
+    ? "bg-[linear-gradient(180deg,_rgba(45,45,45,0.08),_rgba(45,45,45,0.74))]"
+    : "bg-[linear-gradient(180deg,_rgba(45,45,45,0.12),_rgba(45,45,45,0.72))]";
+
+  return (
+    <button
+      type="button"
+      data-team-member-card={enableRevealData ? true : undefined}
+      aria-pressed={isActive}
+      onClick={() => onSelectMember(member.id)}
+      className={`${className} group relative h-full min-h-[11rem] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/55 focus-visible:ring-offset-4 focus-visible:ring-offset-warm-white`}
+    >
+      <motion.div
+        ref={registerVisual?.(member.id)}
+        className={`relative h-full overflow-hidden border bg-charcoal transition-[border-color,box-shadow,opacity,transform] duration-500 ${frameClassName} ${
+          isActive
+            ? "border-gold/55 shadow-[0_34px_95px_-48px_rgba(201,169,110,0.62)]"
+            : "border-charcoal/10 opacity-90 shadow-[0_28px_85px_-55px_rgba(45,45,45,0.3)] group-hover:-translate-y-1 group-hover:border-gold/35 group-hover:opacity-100"
+        } ${isInFlight ? "opacity-0" : "opacity-100"}`}
+      >
+        <Image
+          alt={member.label}
+          className={`object-cover transition-transform duration-700 ${
+            isActive ? "scale-[1.03]" : "scale-100 group-hover:scale-[1.04]"
+          }`}
+          fill
+          sizes={sizes}
+          src={member.image}
+        />
+        <div className={`absolute inset-0 ${overlayClassName}`} />
+
+        <div className={`absolute inset-x-0 bottom-0 ${compact ? "p-3" : "p-4 xl:p-5"}`}>
+          <div className="flex items-end justify-between gap-3">
+            <div className="min-w-0">
+              <p
+                className={`font-semibold uppercase text-pure-white/86 ${
+                  compact ? "text-[0.68rem] tracking-[0.2em]" : "text-[0.72rem] tracking-[0.24em]"
+                }`}
+              >
+                {member.name}
+              </p>
+              <p
+                className={`mt-1 uppercase leading-relaxed text-pure-white/62 ${
+                  compact ? "text-[0.58rem] tracking-[0.18em]" : "text-[0.62rem] tracking-[0.2em]"
+                }`}
+              >
+                {compact ? member.role : member.specialty}
+              </p>
+            </div>
+
+            <span
+              className={`shrink-0 rounded-full border px-3 py-1 text-[0.56rem] font-semibold uppercase tracking-[0.22em] transition-colors duration-300 ${
+                isActive
+                  ? "border-gold/40 bg-charcoal/55 text-gold-light"
+                  : "border-pure-white/14 bg-charcoal/40 text-pure-white/74"
+              }`}
+            >
+              {isActive ? "Activo" : "Abrir"}
+            </span>
+          </div>
+        </div>
+      </motion.div>
+    </button>
+  );
+}
+
+function TeamDetailPanel({
+  activeMember,
+  enableMotion = false,
+  hideVisual = false,
+  slotRef,
+}: Readonly<{
+  activeMember: TeamMember;
+  enableMotion?: boolean;
+  hideVisual?: boolean;
+  slotRef?: RefObject<HTMLDivElement | null>;
+}>) {
+  const content = (
+    <>
+      <p className="text-xs font-semibold uppercase tracking-[0.28em] text-gold">
+        Miembro destacado
+      </p>
+
+      <TeamMemberDetailVisual member={activeMember} hidden={hideVisual} slotRef={slotRef} />
+
+      <div className="space-y-5">
+        <TeamMemberDetailBody member={activeMember} />
+      </div>
+    </>
+  );
+
+  return (
+    <div className="rounded-[2rem] border border-charcoal/10 bg-pure-white/76 p-5 shadow-[0_40px_120px_-70px_rgba(45,45,45,0.38)] backdrop-blur-xl md:p-7 lg:p-8">
+      {enableMotion ? (
+        <AnimatePresence initial={false} mode="wait">
+          <motion.div
+            key={activeMember.id}
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.26, ease: "easeOut" }}
+            className="space-y-6"
+          >
+            {content}
+          </motion.div>
+        </AnimatePresence>
+      ) : (
+        <div className="space-y-6">{content}</div>
+      )}
+    </div>
+  );
+}
+
+function TeamMemberDetailVisual({
+  member,
+  hidden = false,
+  slotRef,
+}: Readonly<{
+  member: TeamMember;
+  hidden?: boolean;
+  slotRef?: RefObject<HTMLDivElement | null>;
+}>) {
+  const className =
+    "relative aspect-[1.08] overflow-hidden rounded-[1.85rem] border border-charcoal/10 bg-charcoal shadow-[0_32px_90px_-60px_rgba(45,45,45,0.42)]";
+
+  return (
+    <div ref={slotRef} className={className}>
+      <div
+        className={`absolute inset-0 transition-opacity duration-200 ${
+          hidden ? "opacity-0" : "opacity-100"
+        }`}
+      >
+        <Image
+          alt={member.label}
+          className="object-cover"
+          fill
+          sizes="(max-width: 1024px) 100vw, 34vw"
+          src={member.image}
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,_rgba(45,45,45,0.14),_rgba(45,45,45,0.22)_38%,_rgba(45,45,45,0.78)_100%)]" />
+        <div className="absolute left-4 top-4 max-w-[80%] rounded-full border border-pure-white/16 bg-charcoal/46 px-4 py-2 text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-pure-white/82 backdrop-blur-md md:left-5 md:top-5 md:text-[0.66rem]">
+          {member.role}
+        </div>
+        <div className="absolute inset-x-0 bottom-0 p-5 md:p-6">
+          <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-pure-white/76">
+            {member.name}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TeamMemberDetailBody({ member }: Readonly<{ member: TeamMember }>) {
+  return (
+    <>
+      <div>
+        <h3 className="text-3xl font-bold tracking-tight text-charcoal md:text-5xl">
+          {member.name}
+        </h3>
+        <p className="mt-3 text-sm font-semibold uppercase tracking-[0.24em] text-charcoal/55 md:text-[0.78rem]">
+          {member.role}
+        </p>
+      </div>
+
+      <p className="text-xl leading-snug text-charcoal md:text-2xl">{member.specialty}</p>
+
+      <p className="text-base leading-relaxed text-text-muted md:text-lg">{member.bio}</p>
+
+      <div className="grid gap-3 sm:grid-cols-[auto_1fr]">
+        <div className="rounded-[1.5rem] border border-charcoal/10 bg-warm-white/80 px-5 py-4">
+          <p className="text-3xl font-bold tracking-tight text-gold md:text-4xl">
+            {member.metric}
+          </p>
+          <p className="mt-1 text-[0.68rem] uppercase tracking-[0.24em] text-text-muted">
+            {member.metricLabel}
+          </p>
+        </div>
+
+        <blockquote className="rounded-[1.5rem] border border-charcoal/10 px-5 py-4 text-sm leading-relaxed text-charcoal/75 md:text-base">
+          “{member.quote}”
+        </blockquote>
+      </div>
+    </>
+  );
+}
+
+function TeamMemberFlightOverlay({
+  member,
+  rects,
+  onComplete,
+}: Readonly<{
+  member: TeamMember;
+  rects: TeamMemberFlight;
+  onComplete: () => void;
+}>) {
+  const duration = 0.76;
+  const easing: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+  return (
+    <motion.div
+      className="pointer-events-none fixed left-0 top-0 z-[80] [perspective:2200px]"
+      initial={{
+        x: rects.startRect.left,
+        y: rects.startRect.top,
+        width: rects.startRect.width,
+        height: rects.startRect.height,
+      }}
+      animate={{
+        x: rects.endRect.left,
+        y: rects.endRect.top,
+        width: rects.endRect.width,
+        height: rects.endRect.height,
+        transition: { duration, ease: easing },
+      }}
+      exit={{ opacity: 0 }}
+      onAnimationComplete={onComplete}
+    >
+      <motion.div
+        className="relative h-full w-full [transform-style:preserve-3d]"
+        initial={{ rotateY: 0 }}
+        animate={{ rotateY: 180, transition: { duration, ease: easing } }}
+      >
+        <div
+          className="absolute inset-0 overflow-hidden rounded-[1.85rem] border border-gold/35 bg-charcoal shadow-[0_34px_95px_-48px_rgba(201,169,110,0.45)]"
+          style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden" }}
+        >
+          <Image
+            alt={member.label}
+            className="object-cover"
+            fill
+            sizes="100vw"
+            src={member.image}
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,_rgba(45,45,45,0.12),_rgba(45,45,45,0.22)_38%,_rgba(45,45,45,0.72)_100%)]" />
+          <div className="absolute inset-x-0 bottom-0 p-4 md:p-5">
+            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-pure-white/84">
+              {member.name}
+            </p>
+          </div>
+        </div>
+
+        <div
+          className="absolute inset-0 overflow-hidden rounded-[1.85rem] border border-gold/45 bg-charcoal shadow-[0_40px_120px_-60px_rgba(201,169,110,0.5)] [transform:rotateY(180deg)]"
+          style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden" }}
+        >
+          <Image
+            alt={member.label}
+            className="object-cover"
+            fill
+            sizes="100vw"
+            src={member.image}
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,_rgba(45,45,45,0.08),_rgba(45,45,45,0.18)_30%,_rgba(45,45,45,0.78)_100%)]" />
+          <div className="absolute left-4 top-4 rounded-full border border-pure-white/16 bg-charcoal/46 px-3 py-2 text-[0.58rem] font-semibold uppercase tracking-[0.22em] text-pure-white/82 backdrop-blur-md md:left-5 md:top-5 md:px-4 md:text-[0.64rem]">
+            {member.role}
+          </div>
+          <div className="absolute inset-x-0 bottom-0 p-4 md:p-6">
+            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-pure-white/80">
+              {member.name}
+            </p>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
