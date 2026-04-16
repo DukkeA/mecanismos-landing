@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+html {
+  scroll-behavior: smooth;
+}
+
 /* ── Design Tokens ── */
 :root {
   --color-charcoal: #2D2D2D;
