@@ -5,6 +5,7 @@ import { HeroSection } from "@/components/sections/HeroSection";
 import { StorySection } from "@/components/sections/StorySection";
 import { ServicesSection } from "@/components/sections/ServicesSection";
 import { TechnologySection } from "@/components/sections/TechnologySection";
+import { TeamSection } from "@/components/sections/TeamSection";
 import { StatsSection } from "@/components/sections/StatsSection";
 import { TrustSection } from "@/components/sections/TrustSection";
 import { ContactSection } from "@/components/sections/ContactSection";
@@ -49,7 +50,7 @@ export default function Home() {
             Brand Carousel 1: warm-white
             Services:         warm-white
             Technology:       charcoal
-            Brand Carousel 2: warm-white
+            Team:             warm-white
             Stats:            charcoal
             Trust:            warm-white
             Contact:          charcoal
@@ -82,17 +83,11 @@ export default function Home() {
 
         <TechnologySection />
 
-        {/* Brand Carousel #2 — Vehículos */}
-        <div className="bg-warm-white px-4 py-8 md:py-12">
-          <div className="mx-auto max-w-6xl">
-            <p className="mb-5 text-center text-xs font-semibold uppercase tracking-[0.3em] text-text-muted">
-              Marcas de vehículos que atendemos
-            </p>
-            <BrandCarousel brands={VEHICLE_BRANDS} direction="right" speed="normal" />
-          </div>
-        </div>
+        {/* Technology (charcoal) → Team (warm-white) via Technology divider */}
 
-        {/* Brand Carousel (warm-white) → Stats: divider is INSIDE StatsSection */}
+        <TeamSection vehicleBrands={VEHICLE_BRANDS} />
+
+        {/* Team (warm-white) → Stats: divider is INSIDE StatsSection */}
 
         <StatsSection />
 
