@@ -107,11 +107,7 @@ export default function Home() {
 
         <TrustSection />
 
-        {/* Trust (warm-white) → Contact (charcoal): gear tooth */}
-        <GearToothDivider
-          topColor="var(--color-warm-white)"
-          bottomColor="var(--color-charcoal)"
-        />
+        {/* Trust → Contact: divider is INSIDE ContactSection */}
 
         <ContactSection />
       </main>

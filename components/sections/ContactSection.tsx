@@ -82,6 +82,21 @@ export function ContactSection({ id = "contacto" }: ContactSectionProps) {
       ref={containerRef}
       className="noise-overlay relative min-h-screen overflow-hidden"
     >
+      {/* ── Gear-tooth divider flush at top — Trust → Contact ── */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 z-10 leading-[0]"
+      >
+        <svg
+          viewBox="0 0 1440 80"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="block h-[60px] w-full"
+        >
+          <polygon points="0,0 1440,0 1440,40 1420,40 1400,10 1360,10 1340,40 1260,40 1240,10 1200,10 1180,40 1100,40 1080,10 1040,10 1020,40 940,40 920,10 880,10 860,40 780,40 760,10 720,10 700,40 620,40 600,10 560,10 540,40 460,40 440,10 400,10 380,40 300,40 280,10 240,10 220,40 140,40 120,10 80,10 60,40 0,40" fill="var(--color-warm-white)" />
+        </svg>
+      </div>
+
       {/* ── Multi-layer background ── */}
       <div className="absolute inset-0 bg-charcoal" />
 
