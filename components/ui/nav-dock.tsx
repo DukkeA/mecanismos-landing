@@ -47,7 +47,8 @@ export function NavDock() {
           return false;
         }
 
-        return window.scrollY + 140 >= section.offsetTop;
+        const rect = section.getBoundingClientRect();
+        return rect.top <= 150;
       });
 
       if (current) {
@@ -196,14 +197,15 @@ function DesktopMagneticIcon({
       onMouseLeave={() => setHovered(false)}
       className={cn(
         'group relative flex items-center justify-center rounded-xl bg-pure-white/[0.05] transition-colors',
-        isActive && 'bg-pure-white/[0.08] shadow-[0_0_8px_rgba(201,169,110,0.4)]',
+        isActive && 'bg-gold/[0.12] shadow-[0_0_12px_rgba(201,169,110,0.5)]',
         containerClassName,
       )}
     >
       {isActive ? (
         <motion.div
-          layoutId="nav-active"
-          className="absolute left-0 h-4 w-0.5 rounded-full bg-gold"
+          layoutId="nav-active-desktop"
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          className="absolute -left-0.5 h-6 w-1 rounded-full bg-gold shadow-[0_0_10px_rgba(201,169,110,0.6)]"
         />
       ) : null}
 
@@ -258,7 +260,7 @@ function MobileNavDock({
             aria-label={item.label}
             className={cn(
               'relative flex h-10 w-10 items-center justify-center rounded-full bg-pure-white/[0.05] transition-colors',
-              isActive && 'bg-pure-white/[0.08]',
+              isActive && 'bg-gold/[0.12]',
             )}
           >
             <item.icon
@@ -271,8 +273,9 @@ function MobileNavDock({
 
             {isActive ? (
               <motion.div
-                layoutId="nav-active"
-                className="absolute -bottom-1 h-1 w-1 rounded-full bg-gold"
+                layoutId="nav-active-mobile"
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                className="absolute -bottom-1.5 h-1 w-4 rounded-full bg-gold shadow-[0_0_8px_rgba(201,169,110,0.5)]"
               />
             ) : null}
           </a>
