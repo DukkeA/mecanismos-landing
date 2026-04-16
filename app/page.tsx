@@ -1,6 +1,5 @@
-import { Navbar } from "@/components/layout/Navbar";
+import { NavDock } from "@/components/ui/nav-dock";
 import { Footer } from "@/components/layout/Footer";
-import { FloatingWhatsApp } from "@/components/layout/FloatingWhatsApp";
 import { BrandCarousel } from "@/components/ui/BrandCarousel";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { StorySection } from "@/components/sections/StorySection";
@@ -40,7 +39,7 @@ const VEHICLE_BRANDS = [
 export default function Home() {
   return (
     <>
-      <Navbar />
+      <NavDock />
 
       <main className="overflow-x-hidden">
         {/* ══════════════════════════════════════════════════════
@@ -119,8 +118,6 @@ export default function Home() {
           <ContactSection />
           <Footer />
         </div>
-
-        <FloatingWhatsApp />
       </main>
     </>
   );
