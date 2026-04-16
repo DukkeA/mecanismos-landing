@@ -56,18 +56,23 @@ export function StorySection({ id = "historia" }: { id?: string }) {
       const panels = gsap.utils.toArray<HTMLElement>("[data-epoch-panel]");
       if (panels.length === 0) return;
 
-      const totalScroll = track.scrollWidth - window.innerWidth;
+      // Recalculated on every refresh so mobile address-bar changes
+      // and ultrawide resizes always produce the correct distance.
+      const getScrollDistance = () =>
+        Math.max(0, track.scrollWidth - container.clientWidth);
 
       // ── Horizontal scroll: pin container, scrub track left ──
       const horizontalTween = gsap.to(track, {
-        x: () => -totalScroll,
+        x: () => -getScrollDistance(),
         ease: "none",
         scrollTrigger: {
           trigger: container,
           pin: true,
           scrub: 1,
           start: "top top",
-          end: () => `+=${totalScroll}`,
+          end: () => `+=${getScrollDistance()}`,
+          anticipatePin: 1,
+          snap: 1 / (panels.length - 1),
           invalidateOnRefresh: true,
         },
       });
