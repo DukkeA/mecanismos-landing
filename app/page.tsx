@@ -89,12 +89,6 @@ export default function Home() {
 
         <TechnologySection />
 
-        {/* Technology (charcoal) → Brand Carousel (warm-white): wave */}
-        <WaveDivider
-          topColor="var(--color-charcoal)"
-          bottomColor="var(--color-warm-white)"
-        />
-
         {/* Brand Carousel #2 — Vehículos */}
         <div className="bg-warm-white px-4 py-8 md:py-12">
           <div className="mx-auto max-w-6xl">

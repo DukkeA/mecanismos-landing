@@ -5,6 +5,8 @@ import Image from "next/image";
 import { DURATION, EASE, SCROLL_DEFAULTS, prefersReducedMotion } from "@/lib/animations";
 import { gsap, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
 
+import { TechnologyBrandsDivider } from "@/components/svg/technology-brands-divider";
+
 registerGSAPPlugins();
 
 const features = [
@@ -171,6 +173,9 @@ export function TechnologySection({ id = "tecnologia" }: { id?: string }) {
           </p>
         </div>
       </div>
+
+      {/* ── Wave divider flush at bottom — Technology → Brand Carousel ── */}
+      <TechnologyBrandsDivider />
     </section>
   );
 }
