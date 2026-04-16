@@ -9,12 +9,6 @@ import { TechnologySection } from "@/components/sections/TechnologySection";
 import { StatsSection } from "@/components/sections/StatsSection";
 import { TrustSection } from "@/components/sections/TrustSection";
 import { ContactSection } from "@/components/sections/ContactSection";
-import {
-  WaveDivider,
-  AngleDivider,
-  GearToothDivider,
-  DoubleWaveDivider,
-} from "@/components/svg/SectionDividers";
 
 const PARTS_BRANDS = [
   { name: "Bosch" },
@@ -107,13 +101,27 @@ export default function Home() {
 
         <TrustSection />
 
-        {/* Trust → Contact: divider is INSIDE ContactSection */}
+        {/* Trust → Contact + Footer: shared background wrapper */}
 
-        <ContactSection />
+        <div className="noise-overlay relative overflow-hidden">
+          {/* Shared multi-layer background */}
+          <div className="absolute inset-0 bg-charcoal" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_0%_50%,_rgba(201,169,110,0.12),_transparent)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_100%_30%,_rgba(184,184,184,0.06),_transparent_50%)]" />
+          <div
+            className="absolute inset-0 opacity-[0.02]"
+            style={{
+              backgroundImage: `linear-gradient(rgba(201,169,110,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(201,169,110,0.4) 1px, transparent 1px)`,
+              backgroundSize: "60px 60px",
+            }}
+          />
+
+          <ContactSection />
+          <Footer />
+        </div>
+
+        <FloatingWhatsApp />
       </main>
-
-      <Footer />
-      <FloatingWhatsApp />
     </>
   );
 }

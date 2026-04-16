@@ -13,8 +13,8 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-charcoal text-text-light">
-      <div className="mx-auto grid max-w-7xl gap-10 px-6 py-14 sm:px-8 lg:grid-cols-[1.2fr_0.8fr_0.8fr] lg:px-10">
+    <footer className="relative text-text-light">
+      <div className="relative mx-auto grid max-w-7xl gap-10 px-6 py-14 sm:px-8 lg:grid-cols-[1.2fr_0.8fr_0.8fr] lg:px-10">
         <div>
           <p className="text-sm font-black tracking-[0.26em] text-gold uppercase">
             Mecanismos Técnicos
@@ -64,7 +64,7 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-pure-white/10 px-6 py-5 text-center text-xs tracking-[0.16em] text-text-light/60 uppercase sm:px-8 lg:px-10">
+      <div className="relative border-t border-pure-white/10 px-6 py-5 text-center text-xs tracking-[0.16em] text-text-light/60 uppercase sm:px-8 lg:px-10">
         © {year} Mecanismos Técnicos. Todos los derechos reservados.
       </div>
     </footer>

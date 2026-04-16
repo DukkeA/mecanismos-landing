@@ -21,18 +21,6 @@ export function ContactSection({ id = "contacto" }: ContactSectionProps) {
       const container = containerRef.current;
       if (!container) return;
 
-      // ── Background parallax ──
-      gsap.to("[data-contact-bg]", {
-        yPercent: -15,
-        ease: "none",
-        scrollTrigger: {
-          trigger: container,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: true,
-        },
-      });
-
       // ── Left content reveal ──
       gsap.from("[data-contact-info]", {
         x: -60,
@@ -80,7 +68,7 @@ export function ContactSection({ id = "contacto" }: ContactSectionProps) {
     <section
       id={id}
       ref={containerRef}
-      className="noise-overlay relative min-h-screen overflow-hidden"
+      className="relative min-h-screen overflow-hidden"
     >
       {/* ── Gear-tooth divider flush at top — Trust → Contact ── */}
       <div
@@ -97,27 +85,7 @@ export function ContactSection({ id = "contacto" }: ContactSectionProps) {
         </svg>
       </div>
 
-      {/* ── Multi-layer background ── */}
-      <div className="absolute inset-0 bg-charcoal" />
-
-      <div
-        data-contact-bg
-        className="absolute inset-x-0 -top-20 bottom-0"
-      >
-        {/* Radial glow from left */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_0%_50%,_rgba(201,169,110,0.12),_transparent)]" />
-        {/* Subtle glow right */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_100%_30%,_rgba(184,184,184,0.06),_transparent_50%)]" />
-      </div>
-
-      {/* Grid pattern */}
-      <div
-        className="absolute inset-0 opacity-[0.02]"
-        style={{
-          backgroundImage: `linear-gradient(rgba(201,169,110,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(201,169,110,0.4) 1px, transparent 1px)`,
-          backgroundSize: "60px 60px",
-        }}
-      />
+      {/* Content */}
 
       {/* ── Content ── */}
       <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl items-center px-6 py-24 md:px-10 md:py-32">
