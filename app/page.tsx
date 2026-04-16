@@ -85,11 +85,7 @@ export default function Home() {
           }
         />
 
-        {/* Services (warm-white) → Technology (charcoal): gear tooth */}
-        <GearToothDivider
-          topColor="var(--color-warm-white)"
-          bottomColor="var(--color-charcoal)"
-        />
+        {/* Services (warm-white) → Technology: divider is INSIDE TechnologySection */}
 
         <TechnologySection />
 

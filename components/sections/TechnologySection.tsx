@@ -70,8 +70,37 @@ export function TechnologySection({ id = "tecnologia" }: { id?: string }) {
     <section
       id={id}
       ref={containerRef}
-      className="relative min-h-screen overflow-hidden"
+      className="relative -mt-[60px] min-h-screen overflow-visible"
     >
+      {/* ── Gear-tooth divider at the top, translated upward to overlap Services ──
+          The teeth inherit Technology's dark gradient via SVG linearGradient. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute top-0 left-0 z-10 w-full -translate-y-full leading-[0]"
+      >
+        <svg
+          viewBox="0 0 1440 80"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="block h-[60px] w-full"
+        >
+          <defs>
+            <linearGradient id="tech-gradient-teeth" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="rgba(45,45,45,0.95)" />
+              <stop offset="50%" stopColor="rgba(45,45,45,0.80)" />
+              <stop offset="100%" stopColor="rgba(45,45,45,0.40)" />
+            </linearGradient>
+          </defs>
+          {/* warm-white background (Services color) */}
+          <rect width="1440" height="80" fill="var(--color-warm-white)" />
+          {/* Gear teeth filled with Technology's gradient */}
+          <path
+            d="M0,40 L60,40 L80,10 L120,10 L140,40 L220,40 L240,10 L280,10 L300,40 L380,40 L400,10 L440,10 L460,40 L540,40 L560,10 L600,10 L620,40 L700,40 L720,10 L760,10 L780,40 L860,40 L880,10 L920,10 L940,40 L1020,40 L1040,10 L1080,10 L1100,40 L1180,40 L1200,10 L1240,10 L1260,40 L1340,40 L1360,10 L1400,10 L1420,40 L1440,40 L1440,80 L0,80 Z"
+            fill="url(#tech-gradient-teeth)"
+          />
+        </svg>
+      </div>
+
       {/* ── Full-bleed background with zoom ── */}
       <div
         data-tech-bg
