@@ -184,7 +184,7 @@ export function StorySection({ id = "historia" }: { id?: string }) {
             />
 
             {/* Timeline dots — extra top offset to clear the wave clip-path */}
-            <div className="absolute left-8 top-20 flex items-center gap-4 md:left-12 md:top-24">
+            <div className="absolute left-6 top-[35%] flex items-center gap-4 sm:top-[30%] md:left-12 md:top-24">
               <div className="flex items-center gap-2">
                 {epochs.map((_, dotIndex) => (
                   <span
@@ -204,16 +204,47 @@ export function StorySection({ id = "historia" }: { id?: string }) {
               </span>
             </div>
 
-            {/* Content */}
-            <div className="relative z-10 grid h-full w-full grid-cols-1 items-center gap-8 px-8 md:grid-cols-2 md:px-16 lg:px-24">
-              <div data-epoch-content className={index % 2 === 1 ? "md:order-2" : ""}>
+            {/* Content — mobile: stacked with image behind, desktop: 2-col text left / image right */}
+            {/* Mobile: image as full-bleed background, text overlaid at bottom */}
+            <div data-epoch-image className="absolute inset-0 md:hidden">
+              <Image
+                alt={epoch.label}
+                className="object-cover"
+                fill
+                sizes="100vw"
+                src={epoch.image}
+                priority={index === 0}
+              />
+              {/* Gradient overlay so text is readable on top */}
+              <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/70 to-transparent" />
+            </div>
+
+            {/* Mobile text content — positioned over the image */}
+            <div data-epoch-content className="relative z-10 flex h-full flex-col justify-end px-6 pb-16 pt-[45%] sm:pb-20 md:hidden">
+              <div
+                data-epoch-year
+                className="mb-2 font-mono text-6xl font-black tracking-tighter text-gold/30 leading-none sm:text-7xl"
+              >
+                {epoch.year}
+              </div>
+              <h3 className="text-2xl font-bold text-pure-white sm:text-3xl">
+                {epoch.title}
+              </h3>
+              <p className="mt-4 max-w-md text-base leading-relaxed text-silver-light/80 sm:text-lg">
+                {epoch.description}
+              </p>
+            </div>
+
+            {/* Desktop/tablet: two-column layout — text left, image right */}
+            <div className="relative z-10 hidden h-full w-full md:grid md:grid-cols-2 md:items-center">
+              <div data-epoch-content className="px-12 lg:px-24">
                 <div
                   data-epoch-year
-                  className="mb-4 font-mono text-7xl font-black tracking-tighter text-gold/20 md:text-[8rem] lg:text-[10rem] leading-none"
+                  className="mb-4 font-mono font-black tracking-tighter text-gold/20 leading-none md:text-[8rem] lg:text-[10rem]"
                 >
                   {epoch.year}
                 </div>
-                <h3 className="text-3xl font-bold text-pure-white md:text-4xl lg:text-5xl">
+                <h3 className="text-4xl font-bold text-pure-white lg:text-5xl">
                   {epoch.title}
                 </h3>
                 <p className="mt-6 max-w-lg text-lg leading-relaxed text-silver-light/70 md:text-xl">
@@ -221,16 +252,17 @@ export function StorySection({ id = "historia" }: { id?: string }) {
                 </p>
               </div>
 
-              <div data-epoch-image className={`relative ${index % 2 === 1 ? "md:order-1" : ""}`}>
-                <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-pure-white/[0.06] shadow-2xl">
-                  <Image
-                    alt={epoch.label}
-                    className="object-cover"
-                    fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    src={epoch.image}
-                  />
-                </div>
+              <div data-epoch-image className="relative h-full">
+                <Image
+                  alt={epoch.label}
+                  className="object-cover"
+                  fill
+                  sizes="50vw"
+                  src={epoch.image}
+                  priority={index === 0}
+                />
+                {/* Soft blend on left edge so image meets text smoothly */}
+                <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-charcoal/60 to-transparent" />
               </div>
             </div>
 
