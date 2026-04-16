@@ -78,11 +78,14 @@ export function StorySection({ id = "historia" }: { id?: string }) {
       });
 
       // ── Each panel: content fades/slides in using containerAnimation ──
+      // First panel is already visible on load — skip entrance animations.
       panels.forEach((panel, index) => {
-        const content = panel.querySelector("[data-epoch-content]");
-        const year = panel.querySelector("[data-epoch-year]");
+        if (index === 0) return;
 
-        if (content) {
+        const contents = panel.querySelectorAll("[data-epoch-content]");
+        const years = panel.querySelectorAll("[data-epoch-year]");
+
+        contents.forEach((content) => {
           gsap.from(content, {
             x: 80,
             opacity: 0,
@@ -94,9 +97,9 @@ export function StorySection({ id = "historia" }: { id?: string }) {
               scrub: true,
             },
           });
-        }
+        });
 
-        if (year) {
+        years.forEach((year) => {
           gsap.from(year, {
             scale: 0.5,
             opacity: 0,
@@ -108,11 +111,11 @@ export function StorySection({ id = "historia" }: { id?: string }) {
               scrub: true,
             },
           });
-        }
+        });
 
-        // ── Image placeholder parallax (moves slightly slower) ──
-        const img = panel.querySelector("[data-epoch-image]");
-        if (img) {
+        // ── Image parallax (moves slightly slower) ──
+        const images = panel.querySelectorAll("[data-epoch-image]");
+        images.forEach((img) => {
           gsap.from(img, {
             x: 120,
             scrollTrigger: {
@@ -123,7 +126,7 @@ export function StorySection({ id = "historia" }: { id?: string }) {
               scrub: true,
             },
           });
-        }
+        });
 
         // ── Divider line between panels (except last) ──
         if (index < panels.length - 1) {
