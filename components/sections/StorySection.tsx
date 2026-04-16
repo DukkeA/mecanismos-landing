@@ -187,7 +187,7 @@ export function StorySection({ id = "historia" }: { id?: string }) {
             />
 
             {/* Timeline dots — extra top offset to clear the wave clip-path */}
-            <div className="absolute left-6 top-[35%] flex items-center gap-4 sm:top-[30%] md:left-12 md:top-24">
+            <div className="absolute left-6 top-16 z-20 flex items-center gap-4 sm:top-20 md:left-12 md:top-24">
               <div className="flex items-center gap-2">
                 {epochs.map((_, dotIndex) => (
                   <span
@@ -223,7 +223,7 @@ export function StorySection({ id = "historia" }: { id?: string }) {
             </div>
 
             {/* Mobile text content — positioned over the image */}
-            <div data-epoch-content className="relative z-10 flex h-full flex-col justify-end px-6 pb-16 pt-[45%] sm:pb-20 md:hidden">
+            <div data-epoch-content className="relative z-10 flex h-full flex-col justify-end px-6 pb-32 pt-[45%] sm:pb-36 md:hidden">
               <div
                 data-epoch-year
                 className="mb-2 font-mono text-6xl font-black tracking-tighter text-gold/30 leading-none sm:text-7xl"
