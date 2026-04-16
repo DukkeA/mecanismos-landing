@@ -99,11 +99,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Brand Carousel (warm-white) → Stats (charcoal): angle cut */}
-        <AngleDivider
-          topColor="var(--color-warm-white)"
-          bottomColor="var(--color-charcoal)"
-        />
+        {/* Brand Carousel (warm-white) → Stats: divider is INSIDE StatsSection */}
 
         <StatsSection />
 

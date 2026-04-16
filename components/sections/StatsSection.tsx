@@ -101,6 +101,21 @@ export function StatsSection({ id = "stats" }: StatsSectionProps) {
       ref={containerRef}
       className="noise-overlay relative overflow-hidden py-28 md:py-40"
     >
+      {/* ── Angle divider flush at top — Brand Carousel → Stats ── */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 z-10 leading-[0]"
+      >
+        <svg
+          viewBox="0 0 1440 80"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="block h-[60px] w-full"
+        >
+          <polygon points="0,0 1440,0 0,80" fill="var(--color-warm-white)" />
+        </svg>
+      </div>
+
       {/* ── Multi-layer background ── */}
       <div className="absolute inset-0 bg-charcoal" />
 
