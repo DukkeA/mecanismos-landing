@@ -1,7 +1,9 @@
 @import "tailwindcss";
 
-html {
-  scroll-behavior: smooth;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 /* ── Design Tokens ── */
