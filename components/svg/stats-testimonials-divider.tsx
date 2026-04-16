@@ -2,7 +2,7 @@ export const StatsTestimonialsDivider = () => {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute inset-x-0 bottom-0 z-10 rotate-180 leading-[0]"
+      className="pointer-events-none absolute inset-x-0 bottom-[-1px] z-10 leading-[0]"
     >
       <svg
         data-name="Layer 1"
@@ -12,7 +12,7 @@ export const StatsTestimonialsDivider = () => {
         className="block h-[60px] w-full md:h-[80px]"
       >
         <path
-          d="M0,0V7.23C0,65.52,268.63,112.77,600,112.77S1200,65.52,1200,7.23V0Z"
+          d="M0,120V112.77C0,54.48,268.63,7.23,600,7.23S1200,54.48,1200,112.77V120Z"
           fill="var(--color-warm-white)"
         />
       </svg>
