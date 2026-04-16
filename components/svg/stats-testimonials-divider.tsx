@@ -1,8 +1,8 @@
-export const TechnologyBrandsDivider = () => {
+export const StatsTestimonialsDivider = () => {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute inset-x-0 bottom-0 z-10 leading-[0]"
+      className="pointer-events-none absolute inset-x-0 bottom-0 z-10 rotate-180 leading-[0]"
     >
       <svg
         data-name="Layer 1"
@@ -12,7 +12,7 @@ export const TechnologyBrandsDivider = () => {
         className="block h-[60px] w-full md:h-[80px]"
       >
         <path
-          d="M741,116.23C291,117.43,0,27.57,0,6V120H1200V6C1200,27.93,1186.4,119.83,741,116.23Z"
+          d="M0,0V7.23C0,65.52,268.63,112.77,600,112.77S1200,65.52,1200,7.23V0Z"
           fill="var(--color-warm-white)"
         />
       </svg>

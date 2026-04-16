@@ -103,11 +103,7 @@ export default function Home() {
 
         <StatsSection />
 
-        {/* Stats (charcoal) → Trust (warm-white): double wave */}
-        <DoubleWaveDivider
-          topColor="var(--color-charcoal)"
-          bottomColor="var(--color-warm-white)"
-        />
+        {/* Stats → Trust: divider is INSIDE StatsSection */}
 
         <TrustSection />
 

@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { StatCounter } from "@/components/ui/StatCounter";
+import { StatsTestimonialsDivider } from "@/components/svg/stats-testimonials-divider";
 import { DURATION, EASE, prefersReducedMotion } from "@/lib/animations";
 import { gsap, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
 
@@ -197,6 +198,9 @@ export function StatsSection({ id = "stats" }: StatsSectionProps) {
         {/* Decorative separator */}
         <div className="mx-auto mt-20 h-px w-full max-w-4xl bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
       </div>
+
+      {/* ── Shape divider flush at bottom — Stats → Trust ── */}
+      <StatsTestimonialsDivider />
     </section>
   );
 }

@@ -1,5 +1,3 @@
-import React from "react";
-
 /**
  * Wave divider from ShapeDivider.app — 3-layer charcoal waves.
  *
