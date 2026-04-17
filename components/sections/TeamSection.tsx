@@ -165,6 +165,16 @@ const TEAM_STEPS = ["Fundador", "Fundadora", "Equipo interactivo"] as const;
 
 const MOBILE_TEAM_OPERATIVE_PANELS = [TEAM_MEMBERS.slice(2, 4), TEAM_MEMBERS.slice(4, 6)] as const;
 
+const TEAM_SCROLL_HOLD = {
+  desktop: 0.3,
+  mobile: 0.38,
+} as const;
+
+function mapPinnedProgress(progress: number, activeRatio: number) {
+  if (activeRatio <= 0) return 1;
+  return Math.min(progress / activeRatio, 1);
+}
+
 type TeamFlightRect = {
   top: number;
   left: number;
@@ -299,17 +309,16 @@ export function TeamSection({ id = "equipo", vehicleBrands }: TeamSectionProps) 
         gsap.set(progressFills[0], { scaleX: 1 });
       }
 
-      const timeline = gsap.timeline({
-        scrollTrigger: {
-          trigger: stage,
-          start: "top top",
-          end: "+=260%",
-          pin: true,
-          scrub: 1,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-        },
-      });
+      const getActiveBudget = () => stage.clientHeight * 2.6;
+      const getHoldBudget = () => stage.clientHeight * TEAM_SCROLL_HOLD.desktop;
+      const getTotalBudget = () => getActiveBudget() + getHoldBudget();
+      const getActiveRatio = () => {
+        const totalBudget = getTotalBudget();
+        if (totalBudget <= 0) return 1;
+        return getActiveBudget() / totalBudget;
+      };
+
+      const timeline = gsap.timeline({ paused: true });
 
       timeline
         .to(introVisuals[0], { scale: 1.18, ease: "none" }, 0)
@@ -322,6 +331,28 @@ export function TeamSection({ id = "equipo", vehicleBrands }: TeamSectionProps) 
         .to(collageScene, { autoAlpha: 1, y: 0, scale: 1, ease: "none" }, 1.44)
         .to(progressFills[2], { scaleX: 1, ease: "none" }, 1.58)
         .to(collageCards, { autoAlpha: 1, y: 0, stagger: 0.05, ease: "none" }, 1.62);
+
+      const syncTimelineProgress = (progress: number) => {
+        timeline.progress(mapPinnedProgress(progress, getActiveRatio()));
+      };
+
+      ScrollTrigger.create({
+        trigger: stage,
+        start: "top top",
+        end: () => `+=${getTotalBudget()}`,
+        pin: true,
+        scrub: 1,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          syncTimelineProgress(self.progress);
+        },
+        onRefresh: (self) => {
+          syncTimelineProgress(self.progress);
+        },
+      });
+
+      syncTimelineProgress(0);
     },
     { scope: sectionRef },
   );
@@ -578,21 +609,44 @@ function MobileTeamNarrative() {
       if (panels.length === 0) return;
 
       const getScrollDistance = () => Math.max(0, track.scrollWidth - pinTarget.clientWidth);
-      const getScrollBudget = () => getScrollDistance() * 1.35;
+      const getActiveBudget = () => getScrollDistance() * 1.35;
+      const getHoldBudget = () => pinTarget.clientHeight * TEAM_SCROLL_HOLD.mobile;
+      const getTotalBudget = () => getActiveBudget() + getHoldBudget();
+      const getActiveRatio = () => {
+        const totalBudget = getTotalBudget();
+        if (totalBudget <= 0) return 1;
+        return getActiveBudget() / totalBudget;
+      };
 
       const horizontalTween = gsap.to(track, {
         x: () => -getScrollDistance(),
         ease: "none",
-        scrollTrigger: {
-          trigger: section,
-          pin: pinTarget,
-          scrub: 0.3,
-          start: "top top",
-          end: () => `+=${getScrollBudget()}`,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
+        duration: 1,
+        paused: true,
+      });
+
+      const syncHorizontalProgress = (progress: number) => {
+        horizontalTween.progress(mapPinnedProgress(progress, getActiveRatio()));
+      };
+
+      ScrollTrigger.create({
+        trigger: section,
+        pin: pinTarget,
+        scrub: 0.3,
+        start: "top top",
+        end: () => `+=${getTotalBudget()}`,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          syncHorizontalProgress(self.progress);
+        },
+        onRefresh: (self) => {
+          horizontalTween.invalidate();
+          syncHorizontalProgress(self.progress);
         },
       });
+
+      syncHorizontalProgress(0);
 
       panels.forEach((panel, index) => {
         const contents = panel.querySelectorAll("[data-mobile-team-content]");

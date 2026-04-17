@@ -41,6 +41,16 @@ const epochs = [
   },
 ] as const;
 
+const STORY_SCROLL_HOLD = {
+  mobile: 0.4,
+  desktop: 0.28,
+} as const;
+
+function mapPinnedProgress(progress: number, activeRatio: number) {
+  if (activeRatio <= 0) return 1;
+  return Math.min(progress / activeRatio, 1);
+}
+
 export function StorySection({ id = "historia" }: { id?: string }) {
   const containerRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -61,25 +71,46 @@ export function StorySection({ id = "historia" }: { id?: string }) {
       const getScrollDistance = () =>
         Math.max(0, track.scrollWidth - container.clientWidth);
 
-      const mobile = isMobile();
-      const getScrollBudget = () => getScrollDistance() * (mobile ? 1.35 : 1);
+      const getTravelBudget = () => getScrollDistance() * (isMobile() ? 1.35 : 1);
+      const getHoldBudget = () =>
+        container.clientHeight *
+        (isMobile() ? STORY_SCROLL_HOLD.mobile : STORY_SCROLL_HOLD.desktop);
+      const getTotalBudget = () => getTravelBudget() + getHoldBudget();
+      const getActiveRatio = () => {
+        const totalBudget = getTotalBudget();
+        if (totalBudget <= 0) return 1;
+        return getTravelBudget() / totalBudget;
+      };
+      const syncHorizontalProgress = (progress: number) => {
+        horizontalTween.progress(mapPinnedProgress(progress, getActiveRatio()));
+      };
 
-      // ── Horizontal scroll: pin container, scrub track left ──
       const horizontalTween = gsap.to(track, {
         x: () => -getScrollDistance(),
         ease: "none",
-        scrollTrigger: {
-          trigger: container,
-          pin: true,
-          scrub: mobile ? 0.3 : 1,
-          start: "top top",
-          end: () => `+=${getScrollBudget()}`,
-          anticipatePin: 1,
-          snap: mobile ? undefined : 1 / (panels.length - 1),
-          pinSpacing: true,
-          invalidateOnRefresh: true,
+        duration: 1,
+        paused: true,
+      });
+
+      ScrollTrigger.create({
+        trigger: container,
+        pin: true,
+        scrub: isMobile() ? 0.3 : 1,
+        start: "top top",
+        end: () => `+=${getTotalBudget()}`,
+        anticipatePin: 1,
+        pinSpacing: true,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          syncHorizontalProgress(self.progress);
+        },
+        onRefresh: (self) => {
+          horizontalTween.invalidate();
+          syncHorizontalProgress(self.progress);
         },
       });
+
+      syncHorizontalProgress(0);
 
       // ── Each panel: content fades/slides in using containerAnimation ──
       // First panel is already visible on load — skip entrance animations.
