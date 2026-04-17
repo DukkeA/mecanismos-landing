@@ -202,6 +202,9 @@ export function TeamSection({ id = "equipo", vehicleBrands }: TeamSectionProps) 
 
   const activeMember =
     TEAM_MEMBERS.find((member) => member.id === activeMemberId) ?? TEAM_MEMBERS[0];
+  const incomingMember = memberFlight
+    ? TEAM_MEMBERS.find((member) => member.id === memberFlight.memberId) ?? null
+    : null;
 
   const registerCollageVisual = useCallback(
     (memberId: string) => (node: HTMLDivElement | null) => {
@@ -444,6 +447,8 @@ export function TeamSection({ id = "equipo", vehicleBrands }: TeamSectionProps) 
                 activeMember={activeMember}
                 enableMotion
                 hideVisual={Boolean(memberFlight)}
+                incomingMember={incomingMember}
+                isTextTransitioning={Boolean(memberFlight)}
                 slotRef={detailVisualSlotRef}
               />
             </div>
@@ -453,10 +458,7 @@ export function TeamSection({ id = "equipo", vehicleBrands }: TeamSectionProps) 
             {memberFlight ? (
               <TeamMemberFlightOverlay
                 key={memberFlight.memberId}
-                member={
-                  TEAM_MEMBERS.find(({ id: memberId }) => memberId === memberFlight.memberId) ??
-                  activeMember
-                }
+                member={incomingMember ?? activeMember}
                 onComplete={finishMemberFlight}
                 rects={memberFlight}
               />
@@ -701,16 +703,20 @@ function TeamMemberCard({
 
 function TeamDetailPanel({
   activeMember,
+  incomingMember = null,
   enableMotion = false,
   hideVisual = false,
+  isTextTransitioning = false,
   slotRef,
 }: Readonly<{
   activeMember: TeamMember;
+  incomingMember?: TeamMember | null;
   enableMotion?: boolean;
   hideVisual?: boolean;
+  isTextTransitioning?: boolean;
   slotRef?: RefObject<HTMLDivElement | null>;
 }>) {
-  const content = (
+  const staticContent = (
     <>
       <p className="text-xs font-semibold uppercase tracking-[0.28em] text-gold">
         Miembro destacado
@@ -718,29 +724,92 @@ function TeamDetailPanel({
 
       <TeamMemberDetailVisual member={activeMember} hidden={hideVisual} slotRef={slotRef} />
 
-      <div className="space-y-5">
-        <TeamMemberDetailBody member={activeMember} />
-      </div>
+      <TeamMemberDetailBody member={activeMember} />
     </>
   );
 
   return (
     <div className="rounded-[2rem] border border-charcoal/10 bg-pure-white/76 p-5 shadow-[0_40px_120px_-70px_rgba(45,45,45,0.38)] backdrop-blur-xl md:p-7 lg:p-8">
       {enableMotion ? (
-        <AnimatePresence initial={false} mode="wait">
-          <motion.div
-            key={activeMember.id}
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.26, ease: "easeOut" }}
-            className="space-y-6"
+        <div className="space-y-6">
+          <motion.p
+            animate={
+              isTextTransitioning
+                ? { opacity: 0.42, y: -6, filter: "blur(4px)" }
+                : { opacity: 1, y: 0, filter: "blur(0px)" }
+            }
+            transition={{ duration: isTextTransitioning ? 0.28 : 0.32, ease: "easeOut" }}
+            className="text-xs font-semibold uppercase tracking-[0.28em] text-gold"
+            style={{ willChange: "opacity, transform, filter" }}
           >
-            {content}
-          </motion.div>
-        </AnimatePresence>
+            Miembro destacado
+          </motion.p>
+
+          <TeamMemberDetailVisual member={activeMember} hidden={hideVisual} slotRef={slotRef} />
+
+          <TeamMemberDetailTextTransition
+            currentMember={activeMember}
+            incomingMember={incomingMember}
+            isTransitioning={isTextTransitioning}
+          />
+        </div>
       ) : (
-        <div className="space-y-6">{content}</div>
+        <div className="space-y-6">{staticContent}</div>
       )}
+    </div>
+  );
+}
+
+function TeamMemberDetailTextTransition({
+  currentMember,
+  incomingMember,
+  isTransitioning,
+}: Readonly<{
+  currentMember: TeamMember;
+  incomingMember: TeamMember | null;
+  isTransitioning: boolean;
+}>) {
+  if (!incomingMember || incomingMember.id === currentMember.id) {
+    return (
+      <motion.div
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="space-y-5"
+      >
+        <TeamMemberDetailBody member={currentMember} />
+      </motion.div>
+    );
+  }
+
+  return (
+    <div className="grid">
+      <motion.div
+        aria-hidden="true"
+        animate={
+          isTransitioning
+            ? { opacity: 0, y: -20, filter: "blur(10px)", scale: 0.985 }
+            : { opacity: 1, y: 0, filter: "blur(0px)", scale: 1 }
+        }
+        transition={{ duration: 0.32, ease: "easeOut" }}
+        className="space-y-5 [grid-area:1/1]"
+        style={{ willChange: "opacity, transform, filter" }}
+      >
+        <TeamMemberDetailBody member={currentMember} />
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 22, filter: "blur(14px)", scale: 0.985 }}
+        animate={
+          isTransitioning
+            ? { opacity: 1, y: 0, filter: "blur(0px)", scale: 1 }
+            : { opacity: 1, y: 0, filter: "blur(0px)", scale: 1 }
+        }
+        transition={{ duration: 0.46, delay: 0.1, ease: "easeOut" }}
+        className="space-y-5 [grid-area:1/1]"
+        style={{ willChange: "opacity, transform, filter" }}
+      >
+        <TeamMemberDetailBody member={incomingMember} />
+      </motion.div>
     </div>
   );
 }
