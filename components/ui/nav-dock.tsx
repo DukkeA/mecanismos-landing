@@ -6,6 +6,7 @@ import {
   Home,
   Mail,
   MessageCircle,
+  Users,
   Wrench,
   type LucideIcon,
 } from 'lucide-react';
@@ -27,6 +28,7 @@ const NAV_ITEMS = [
   { href: '#historia', label: 'Historia', id: 'historia', icon: Clock },
   { href: '#servicios', label: 'Servicios', id: 'servicios', icon: Wrench },
   { href: '#tecnologia', label: 'Tecnología', id: 'tecnologia', icon: Cpu },
+  { href: '#equipo', label: 'Equipo', id: 'equipo', icon: Users },
   { href: '#contacto', label: 'Contacto', id: 'contacto', icon: Mail },
 ] as const;
 
