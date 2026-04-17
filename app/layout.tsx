@@ -32,7 +32,21 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-screen">{children}</body>
+      <body className="min-h-screen">
+        {/* Global SVG clipPath definitions — placed in the server-rendered layout
+            so every client component can reference them via clip-path: url(#id). */}
+        <svg
+          width="0"
+          height="0"
+          aria-hidden="true"
+          style={{ position: "absolute" }}
+        >
+          <defs>
+            {/* Reserved for future global clipPaths */}
+          </defs>
+        </svg>
+        {children}
+      </body>
     </html>
   );
 }

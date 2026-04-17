@@ -1,8 +1,6 @@
 "use client";
 
 import { useRef } from "react";
-import { GearSVG } from "@/components/svg/GearSVG";
-import { PistonSVG } from "@/components/svg/PistonSVG";
 import { DURATION, EASE, STAGGER, prefersReducedMotion } from "@/lib/animations";
 import { gsap, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
 
@@ -28,11 +26,12 @@ export function HeroSection({ id = "inicio" }: { id?: string }) {
         delay: 0.3,
       });
 
-      // ── Parallax: gears move at different speeds on scroll ──
-      gsap.utils.toArray<HTMLElement>("[data-parallax]").forEach((el) => {
-        const speed = parseFloat(el.dataset.parallax || "0.5");
-        gsap.to(el, {
-          y: () => speed * 200,
+      // ── Parallax: video dims slightly on scroll ──
+      const videoEl = container.querySelector("[data-hero-video]");
+      if (videoEl) {
+        gsap.to(videoEl, {
+          scale: 1.1,
+          opacity: 0.15,
           ease: "none",
           scrollTrigger: {
             trigger: container,
@@ -41,7 +40,7 @@ export function HeroSection({ id = "inicio" }: { id?: string }) {
             scrub: true,
           },
         });
-      });
+      }
 
       // ── Zoom-out on scroll: hero content shrinks slightly for depth ──
       gsap.to("[data-hero-content]", {
@@ -85,31 +84,16 @@ export function HeroSection({ id = "inicio" }: { id?: string }) {
         className="absolute inset-0 bg-[linear-gradient(to_bottom,_transparent_60%,_rgba(45,45,45,0.95))] opacity-40"
       />
 
-      {/* ── Parallax decorative layer: gears at different depths ── */}
-      <GearSVG
-        data-parallax="-0.3"
-        className="pointer-events-none absolute -left-16 -top-16 text-gold/[0.08] animate-float-slow"
-        size={220}
-      />
-      <GearSVG
-        data-parallax="0.2"
-        className="pointer-events-none absolute right-[8%] top-[12%] text-silver/[0.07] [animation-direction:reverse] animate-float"
-        size={140}
-      />
-      <GearSVG
-        data-parallax="0.5"
-        className="pointer-events-none absolute -bottom-20 right-[-5%] text-gold/[0.06] animate-float-delayed"
-        size={280}
-      />
-      <GearSVG
-        data-parallax="-0.15"
-        className="pointer-events-none absolute bottom-[20%] left-[5%] text-silver/[0.05] animate-float"
-        size={100}
-      />
-      <PistonSVG
-        data-parallax="0.35"
-        className="pointer-events-none absolute right-[15%] bottom-[10%] opacity-[0.04]"
-        size={160}
+      {/* ── Background video ── */}
+      <video
+        data-hero-video
+        autoPlay
+        muted
+        loop
+        playsInline
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-30"
+        src="/hero-video-loop.mp4"
       />
 
       {/* ── Subtle grid pattern ── */}

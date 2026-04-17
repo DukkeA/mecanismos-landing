@@ -32,7 +32,7 @@ export function BrandCarousel({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-full border border-silver/40 bg-pure-white/80 py-4 ${className}`.trim()}
+      className={`relative w-full overflow-hidden border-y border-charcoal/10 py-4 ${className}`.trim()}
       style={{
         maskImage:
           "linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
@@ -47,7 +47,7 @@ export function BrandCarousel({
         {items.map((brand, index) => (
           <div
             key={`${brand.name}-${index}`}
-            className="group flex min-w-[11rem] items-center justify-center rounded-full border border-silver/35 bg-warm-white/70 px-6 py-3 text-center text-sm font-semibold tracking-[0.24em] text-charcoal/60 uppercase transition-all duration-300 hover:border-gold/60 hover:text-gold"
+            className="group flex min-w-[11rem] items-center justify-center rounded-full border border-charcoal/12 bg-transparent px-6 py-3 text-center text-sm font-semibold tracking-[0.24em] text-charcoal/60 uppercase transition-all duration-300 hover:border-gold/60 hover:text-gold"
           >
             {brand.logo ? (
               // eslint-disable-next-line @next/next/no-img-element

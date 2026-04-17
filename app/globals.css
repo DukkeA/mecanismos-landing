@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 /* ── Design Tokens ── */
 :root {
   --color-charcoal: #2D2D2D;
@@ -222,6 +228,23 @@ html {
   overflow: hidden;
 }
 
+/* Wave clip on Story section — overlaps Hero and cuts the top edge
+   so Hero's real background shows through the wave shape.
+   padding-top compensates so panel content (timeline dots) isn't clipped. */
+.story-section-clip {
+  position: relative;
+  margin-top: -60px;
+  clip-path: url(#wave-clip-hero-story);
+  z-index: 1;
+}
+
+@media (min-width: 768px) {
+  .story-section-clip {
+    margin-top: -80px;
+  }
+}
+
+
 .horizontal-scroll-track {
   display: flex;
   width: max-content;
@@ -230,7 +253,8 @@ html {
 
 .horizontal-scroll-panel {
   width: 100vw;
-  height: 100vh;
+  height: 100svh;
+  min-height: 100svh;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -239,30 +263,33 @@ html {
   overflow: hidden;
 }
 
-/* ── Section Divider Positioning ──
-   Dividers sit as the LAST child inside a section, positioned at the
-   very bottom. The SVG's upper area is transparent — the parent section's
-   real background (gradients, noise, images) shows through. The shaped
-   path fills with the NEXT section's color.
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
-   The parent section needs `position: relative` and enough padding-bottom
-   so the divider doesn't overlap content. The NEXT section uses a small
-   negative margin-top to tuck under the divider seamlessly.
-*/
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── SVG divider positioning ── */
 .section-divider {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 10;
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
   line-height: 0;
-  pointer-events: none;
+  z-index: 10;
 }
 
 .section-divider svg {
   display: block;
   width: 100%;
   height: auto;
+}
+
+.section-divider-flip {
+  transform: scaleY(-1);
 }
 
 /* ── Selection ── */

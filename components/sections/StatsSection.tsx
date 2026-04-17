@@ -2,9 +2,9 @@
 
 import { useRef } from "react";
 import { StatCounter } from "@/components/ui/StatCounter";
+import { StatsTestimonialsDivider } from "@/components/svg/stats-testimonials-divider";
 import { DURATION, EASE, prefersReducedMotion } from "@/lib/animations";
 import { gsap, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
-import { DoubleWaveDivider } from "@/components/svg/SectionDividers";
 
 registerGSAPPlugins();
 
@@ -29,9 +29,9 @@ export function StatsSection({ id = "stats" }: StatsSectionProps) {
       const container = containerRef.current;
       if (!container) return;
 
-      // ── Parallax background layers ──
+      // ── Background motion (zoom, like TechnologySection) ──
       gsap.to("[data-stats-bg-layer]", {
-        yPercent: -20,
+        scale: 1.12,
         ease: "none",
         scrollTrigger: {
           trigger: container,
@@ -100,18 +100,34 @@ export function StatsSection({ id = "stats" }: StatsSectionProps) {
     <section
       id={id}
       ref={containerRef}
-      className="noise-overlay relative overflow-hidden pb-36 pt-28 md:pb-48 md:pt-40"
+      className="noise-overlay relative overflow-hidden pt-28 pb-16 md:pt-40 md:pb-24"
     >
+      {/* ── Angle divider flush at top — Brand Carousel → Stats ── */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 z-10 leading-[0]"
+      >
+        <svg
+          viewBox="0 0 1440 80"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="block h-[60px] w-full"
+        >
+          <polygon points="0,0 1440,0 0,80" fill="var(--color-warm-white)" />
+        </svg>
+      </div>
+
       {/* ── Multi-layer background ── */}
       <div className="absolute inset-0 bg-charcoal" />
 
       {/* Parallax gradient layer */}
       <div
         data-stats-bg-layer
-        className="absolute inset-x-0 -top-20 bottom-0"
+        className="absolute inset-0 scale-100"
       >
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,_rgba(201,169,110,0.18),_transparent)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,_rgba(184,148,79,0.1),_transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_90%_55%_at_50%_100%,_rgba(201,169,110,0.12),_transparent_72%)]" />
       </div>
 
       {/* Subtle grid pattern */}
@@ -181,11 +197,11 @@ export function StatsSection({ id = "stats" }: StatsSectionProps) {
         </div>
 
         {/* Decorative separator */}
-        <div className="mx-auto mt-20 h-px w-full max-w-4xl bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
+        <div className="mx-auto mt-12 h-px w-full max-w-4xl bg-gradient-to-r from-transparent via-gold/30 to-transparent md:mt-20" />
       </div>
 
-      {/* Shaped transition to Trust section (warm-white) */}
-      <DoubleWaveDivider fill="var(--color-warm-white)" />
+      {/* ── Shape divider flush at bottom — Stats → Trust ── */}
+      <StatsTestimonialsDivider />
     </section>
   );
 }

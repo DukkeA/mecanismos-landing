@@ -3,8 +3,7 @@
 import { useRef } from "react";
 import Image from "next/image";
 import { GearSVG } from "@/components/svg/GearSVG";
-import { WaveDivider } from "@/components/svg/SectionDividers";
-import { prefersReducedMotion } from "@/lib/animations";
+import { isMobile, prefersReducedMotion } from "@/lib/animations";
 import { gsap, ScrollTrigger, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
 
 registerGSAPPlugins();
@@ -42,6 +41,16 @@ const epochs = [
   },
 ] as const;
 
+const STORY_SCROLL_HOLD = {
+  mobile: 0.4,
+  desktop: 0.28,
+} as const;
+
+function mapPinnedProgress(progress: number, activeRatio: number) {
+  if (activeRatio <= 0) return 1;
+  return Math.min(progress / activeRatio, 1);
+}
+
 export function StorySection({ id = "historia" }: { id?: string }) {
   const containerRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -57,28 +66,61 @@ export function StorySection({ id = "historia" }: { id?: string }) {
       const panels = gsap.utils.toArray<HTMLElement>("[data-epoch-panel]");
       if (panels.length === 0) return;
 
-      const totalScroll = track.scrollWidth - window.innerWidth;
+      // Recalculated on every refresh so mobile address-bar changes
+      // and ultrawide resizes always produce the correct distance.
+      const getScrollDistance = () =>
+        Math.max(0, track.scrollWidth - container.clientWidth);
 
-      // ── Horizontal scroll: pin container, scrub track left ──
+      const getTravelBudget = () => getScrollDistance() * (isMobile() ? 1.35 : 1);
+      const getHoldBudget = () =>
+        container.clientHeight *
+        (isMobile() ? STORY_SCROLL_HOLD.mobile : STORY_SCROLL_HOLD.desktop);
+      const getTotalBudget = () => getTravelBudget() + getHoldBudget();
+      const getActiveRatio = () => {
+        const totalBudget = getTotalBudget();
+        if (totalBudget <= 0) return 1;
+        return getTravelBudget() / totalBudget;
+      };
+      const syncHorizontalProgress = (progress: number) => {
+        horizontalTween.progress(mapPinnedProgress(progress, getActiveRatio()));
+      };
+
       const horizontalTween = gsap.to(track, {
-        x: () => -totalScroll,
+        x: () => -getScrollDistance(),
         ease: "none",
-        scrollTrigger: {
-          trigger: container,
-          pin: true,
-          scrub: 1,
-          start: "top top",
-          end: () => `+=${totalScroll}`,
-          invalidateOnRefresh: true,
+        duration: 1,
+        paused: true,
+      });
+
+      ScrollTrigger.create({
+        trigger: container,
+        pin: true,
+        scrub: isMobile() ? 0.3 : 1,
+        start: "top top",
+        end: () => `+=${getTotalBudget()}`,
+        anticipatePin: 1,
+        pinSpacing: true,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          syncHorizontalProgress(self.progress);
+        },
+        onRefresh: (self) => {
+          horizontalTween.invalidate();
+          syncHorizontalProgress(self.progress);
         },
       });
 
-      // ── Each panel: content fades/slides in using containerAnimation ──
-      panels.forEach((panel, index) => {
-        const content = panel.querySelector("[data-epoch-content]");
-        const year = panel.querySelector("[data-epoch-year]");
+      syncHorizontalProgress(0);
 
-        if (content) {
+      // ── Each panel: content fades/slides in using containerAnimation ──
+      // First panel is already visible on load — skip entrance animations.
+      panels.forEach((panel, index) => {
+        if (index === 0) return;
+
+        const contents = panel.querySelectorAll("[data-epoch-content]");
+        const years = panel.querySelectorAll("[data-epoch-year]");
+
+        contents.forEach((content) => {
           gsap.from(content, {
             x: 80,
             opacity: 0,
@@ -90,9 +132,9 @@ export function StorySection({ id = "historia" }: { id?: string }) {
               scrub: true,
             },
           });
-        }
+        });
 
-        if (year) {
+        years.forEach((year) => {
           gsap.from(year, {
             scale: 0.5,
             opacity: 0,
@@ -104,11 +146,11 @@ export function StorySection({ id = "historia" }: { id?: string }) {
               scrub: true,
             },
           });
-        }
+        });
 
-        // ── Image placeholder parallax (moves slightly slower) ──
-        const img = panel.querySelector("[data-epoch-image]");
-        if (img) {
+        // ── Image parallax (moves slightly slower) ──
+        const images = panel.querySelectorAll("[data-epoch-image]");
+        images.forEach((img) => {
           gsap.from(img, {
             x: 120,
             scrollTrigger: {
@@ -119,7 +161,7 @@ export function StorySection({ id = "historia" }: { id?: string }) {
               scrub: true,
             },
           });
-        }
+        });
 
         // ── Divider line between panels (except last) ──
         if (index < panels.length - 1) {
@@ -145,7 +187,17 @@ export function StorySection({ id = "historia" }: { id?: string }) {
   );
 
   return (
-    <section id={id} ref={containerRef} className="horizontal-scroll-container relative bg-charcoal">
+    <section id={id} ref={containerRef} className="horizontal-scroll-container relative bg-charcoal story-section-clip">
+      {/* Inline SVG clipPath for the wave-cut top edge.
+          Uses objectBoundingBox units (0-1) so it scales to any element size.
+          The wave occupies roughly the top 6% of the section; below that is fully visible. */}
+      <svg width="0" height="0" aria-hidden="true" className="absolute">
+        <defs>
+          <clipPath id="wave-clip-hero-story" clipPathUnits="objectBoundingBox">
+            <path d="M0,0.06 C0.15,0 0.3,0.08 0.5,0.04 C0.7,0 0.85,0.08 1,0.03 L1,1 L0,1 Z" />
+          </clipPath>
+        </defs>
+      </svg>
       {/* ── Horizontal track ── */}
       <div ref={trackRef} className="horizontal-scroll-track">
         {epochs.map((epoch, index) => (
@@ -169,8 +221,8 @@ export function StorySection({ id = "historia" }: { id?: string }) {
               size={index === 2 ? 300 : 200}
             />
 
-            {/* Timeline dots */}
-            <div className="absolute left-8 top-8 flex items-center gap-4 md:left-12 md:top-12">
+            {/* Timeline dots — extra top offset to clear the wave clip-path */}
+            <div className="absolute left-6 top-16 z-20 flex items-center gap-4 sm:top-20 md:left-12 md:top-24">
               <div className="flex items-center gap-2">
                 {epochs.map((_, dotIndex) => (
                   <span
@@ -190,16 +242,47 @@ export function StorySection({ id = "historia" }: { id?: string }) {
               </span>
             </div>
 
-            {/* Content */}
-            <div className="relative z-10 grid h-full w-full grid-cols-1 items-center gap-8 px-8 md:grid-cols-2 md:px-16 lg:px-24">
-              <div data-epoch-content className={index % 2 === 1 ? "md:order-2" : ""}>
+            {/* Content — mobile: stacked with image behind, desktop: 2-col text left / image right */}
+            {/* Mobile: image as full-bleed background, text overlaid at bottom */}
+            <div data-epoch-image className="absolute inset-0 md:hidden">
+              <Image
+                alt={epoch.label}
+                className="object-cover"
+                fill
+                sizes="100vw"
+                src={epoch.image}
+                priority={index === 0}
+              />
+              {/* Gradient overlay so text is readable on top */}
+              <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/70 to-transparent" />
+            </div>
+
+            {/* Mobile text content — positioned over the image */}
+            <div data-epoch-content className="relative z-10 flex h-full flex-col justify-end px-6 pb-32 pt-[45%] sm:pb-36 md:hidden">
+              <div
+                data-epoch-year
+                className="mb-2 font-mono text-6xl font-black tracking-tighter text-gold/30 leading-none sm:text-7xl"
+              >
+                {epoch.year}
+              </div>
+              <h3 className="text-2xl font-bold text-pure-white sm:text-3xl">
+                {epoch.title}
+              </h3>
+              <p className="mt-4 max-w-md text-base leading-relaxed text-silver-light/80 sm:text-lg">
+                {epoch.description}
+              </p>
+            </div>
+
+            {/* Desktop/tablet: two-column layout — text left, image right */}
+            <div className="relative z-10 hidden h-full w-full md:grid md:grid-cols-2 md:items-center">
+              <div data-epoch-content className="px-12 lg:px-24">
                 <div
                   data-epoch-year
-                  className="mb-4 font-mono text-7xl font-black tracking-tighter text-gold/20 md:text-[8rem] lg:text-[10rem] leading-none"
+                  className="mb-4 font-mono font-black tracking-tighter text-gold/20 leading-none md:text-[8rem] lg:text-[10rem]"
                 >
                   {epoch.year}
                 </div>
-                <h3 className="text-3xl font-bold text-pure-white md:text-4xl lg:text-5xl">
+                <h3 className="text-4xl font-bold text-pure-white lg:text-5xl">
                   {epoch.title}
                 </h3>
                 <p className="mt-6 max-w-lg text-lg leading-relaxed text-silver-light/70 md:text-xl">
@@ -207,16 +290,17 @@ export function StorySection({ id = "historia" }: { id?: string }) {
                 </p>
               </div>
 
-              <div data-epoch-image className={`relative ${index % 2 === 1 ? "md:order-1" : ""}`}>
-                <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-pure-white/[0.06] shadow-2xl">
-                  <Image
-                    alt={epoch.label}
-                    className="object-cover"
-                    fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    src={epoch.image}
-                  />
-                </div>
+              <div data-epoch-image className="relative h-full">
+                <Image
+                  alt={epoch.label}
+                  className="object-cover"
+                  fill
+                  sizes="50vw"
+                  src={epoch.image}
+                  priority={index === 0}
+                />
+                {/* Soft blend on left edge so image meets text smoothly */}
+                <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-charcoal/60 to-transparent" />
               </div>
             </div>
 
@@ -230,9 +314,6 @@ export function StorySection({ id = "historia" }: { id?: string }) {
           </div>
         ))}
       </div>
-
-      {/* Shaped transition to next section (warm-white) */}
-      <WaveDivider fill="var(--color-warm-white)" />
     </section>
   );
 }

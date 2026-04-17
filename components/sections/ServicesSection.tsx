@@ -1,10 +1,10 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, type ReactNode } from "react";
 import Image from "next/image";
 import { DURATION, EASE, SCROLL_DEFAULTS, prefersReducedMotion } from "@/lib/animations";
 import { gsap, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
-import { GearToothDivider } from "@/components/svg/SectionDividers";
+import { StoryServicesDivider } from "@/components/svg/story-services-divider";
 
 registerGSAPPlugins();
 
@@ -41,7 +41,13 @@ const services = [
   },
 ] as const;
 
-export function ServicesSection({ id = "servicios" }: { id?: string }) {
+export function ServicesSection({
+  id = "servicios",
+  brandCarousel,
+}: {
+  id?: string;
+  brandCarousel?: ReactNode;
+}) {
   const containerRef = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -82,10 +88,21 @@ export function ServicesSection({ id = "servicios" }: { id?: string }) {
     <section
       id={id}
       ref={containerRef}
-      className="noise-overlay relative overflow-hidden bg-warm-white pb-32 pt-24 md:pb-44 md:pt-36"
+      className="noise-overlay relative z-2 -mt-20 bg-warm-white pt-28 pb-24 md:-mt-[120px] md:pt-44 md:pb-36"
     >
+      {/* Wave divider: charcoal waves flowing down over warm-white, fusing with Story above */}
+      <StoryServicesDivider />
+
       {/* Subtle diagonal background accent */}
       <div className="absolute inset-0 bg-[linear-gradient(135deg,_transparent_40%,_rgba(201,169,110,0.04)_40%,_rgba(201,169,110,0.04)_60%,_transparent_60%)]" />
+
+      {/* Brand carousel sits above the services content, inside the same
+          section so it inherits the diagonal gradient + noise overlay. */}
+      {brandCarousel && (
+        <div className="relative z-10 mb-16 w-full md:mb-20">
+          {brandCarousel}
+        </div>
+      )}
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 md:px-10">
         {/* Header */}
@@ -167,9 +184,6 @@ export function ServicesSection({ id = "servicios" }: { id?: string }) {
           })}
         </div>
       </div>
-
-      {/* Shaped transition to Technology section (charcoal) */}
-      <GearToothDivider fill="var(--color-charcoal)" />
     </section>
   );
 }

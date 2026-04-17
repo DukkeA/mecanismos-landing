@@ -21,18 +21,6 @@ export function ContactSection({ id = "contacto" }: ContactSectionProps) {
       const container = containerRef.current;
       if (!container) return;
 
-      // ── Background parallax ──
-      gsap.to("[data-contact-bg]", {
-        yPercent: -15,
-        ease: "none",
-        scrollTrigger: {
-          trigger: container,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: true,
-        },
-      });
-
       // ── Left content reveal ──
       gsap.from("[data-contact-info]", {
         x: -60,
@@ -80,29 +68,24 @@ export function ContactSection({ id = "contacto" }: ContactSectionProps) {
     <section
       id={id}
       ref={containerRef}
-      className="noise-overlay relative min-h-screen overflow-hidden"
+      className="relative min-h-screen overflow-hidden"
     >
-      {/* ── Multi-layer background ── */}
-      <div className="absolute inset-0 bg-charcoal" />
-
+      {/* ── Gear-tooth divider flush at top — Trust → Contact ── */}
       <div
-        data-contact-bg
-        className="absolute inset-x-0 -top-20 bottom-0"
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 z-10 leading-[0]"
       >
-        {/* Radial glow from left */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_0%_50%,_rgba(201,169,110,0.12),_transparent)]" />
-        {/* Subtle glow right */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_100%_30%,_rgba(184,184,184,0.06),_transparent_50%)]" />
+        <svg
+          viewBox="0 0 1440 80"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="block h-[60px] w-full"
+        >
+          <polygon points="0,0 1440,0 1440,40 1420,40 1400,10 1360,10 1340,40 1260,40 1240,10 1200,10 1180,40 1100,40 1080,10 1040,10 1020,40 940,40 920,10 880,10 860,40 780,40 760,10 720,10 700,40 620,40 600,10 560,10 540,40 460,40 440,10 400,10 380,40 300,40 280,10 240,10 220,40 140,40 120,10 80,10 60,40 0,40" fill="var(--color-warm-white)" />
+        </svg>
       </div>
 
-      {/* Grid pattern */}
-      <div
-        className="absolute inset-0 opacity-[0.02]"
-        style={{
-          backgroundImage: `linear-gradient(rgba(201,169,110,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(201,169,110,0.4) 1px, transparent 1px)`,
-          backgroundSize: "60px 60px",
-        }}
-      />
+      {/* Content */}
 
       {/* ── Content ── */}
       <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl items-center px-6 py-24 md:px-10 md:py-32">
