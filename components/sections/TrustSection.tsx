@@ -1,6 +1,11 @@
 "use client";
 
 import { useRef } from "react";
+import { ArrowRight, Clock3, Gauge, ShieldCheck } from "lucide-react";
+import {
+  TestimonialsColumn,
+  type TestimonialCard,
+} from "@/components/ui/testimonials-columns-1";
 import { DURATION, EASE, prefersReducedMotion } from "@/lib/animations";
 import { gsap, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
 
@@ -10,26 +15,111 @@ interface TrustSectionProps {
   id?: string;
 }
 
-const testimonials = [
+const testimonials: readonly TestimonialCard[] = [
   {
     quote:
-      "Llevé mi camión con problemas de inyección y lo entregaron como nuevo. Excelente servicio y muy profesionales.",
-    author: "Carlos M.",
-    role: "Transportador",
+      "Entramos con una falla intermitente en inyección que nos estaba frenando la ruta. Acá nos explicaron el problema sin vueltas y el camión volvió a salir fino.",
+    name: "Carlos Mejía",
+    role: "Transportador de carga",
+    badge: "Inyección diésel",
+    image:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=320&q=80&auto=format&fit=crop",
   },
   {
     quote:
-      "Más de 10 años llevando mi flota a Mecanismos Técnicos. Siempre cumplen con los tiempos y la calidad es impecable.",
-    author: "Logística del Norte",
-    role: "S.A.S.",
+      "Lo que más valoro es que no improvisan. Te muestran criterio, tiempos claros y respaldo técnico. Para una flota eso vale oro.",
+    name: "Daniela Ríos",
+    role: "Jefa de mantenimiento · flota regional",
+    badge: "Flotas",
+    image:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=320&q=80&auto=format&fit=crop",
   },
   {
     quote:
-      "Me explicaron todo el proceso de la reparación de la transmisión. Transparencia total. Los recomiendo.",
-    author: "Andrea P.",
-    role: "Particular",
+      "Teníamos una transmisión automática golpeando cambios. El diagnóstico fue claro, la reparación prolija y la entrega exactamente cuando dijeron.",
+    name: "Andrés Téllez",
+    role: "Administrador de taller aliado",
+    badge: "Transmisiones",
+    image:
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=320&q=80&auto=format&fit=crop",
+  },
+  {
+    quote:
+      "Se nota cuando un equipo trabaja con método. No fue sólo reparar: nos ayudaron a entender qué originó la falla para que no se repita.",
+    name: "Salomé Vargas",
+    role: "Coordinadora operativa",
+    badge: "Diagnóstico",
+    image:
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=320&q=80&auto=format&fit=crop",
+  },
+  {
+    quote:
+      "Trajimos un vehículo particular con un historial largo de intentos fallidos. Acá dieron con la causa raíz y el cambio fue inmediato en carretera.",
+    name: "Mauricio Castaño",
+    role: "Cliente particular",
+    badge: "Resultado en ruta",
+    image:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=320&q=80&auto=format&fit=crop",
+  },
+  {
+    quote:
+      "Necesitábamos velocidad, pero con respaldo. Cumplieron con ambas: tiempos serios, comunicación constante y prueba final que da tranquilidad.",
+    name: "Laura Villamil",
+    role: "Compras técnicas · agroindustria",
+    badge: "Cumplimiento",
+    image:
+      "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=320&q=80&auto=format&fit=crop",
+  },
+  {
+    quote:
+      "El valor no está sólo en la reparación; está en cómo documentan, explican y respaldan el proceso. Eso nos permitió confiar y seguir trabajando.",
+    name: "Julián Ocampo",
+    role: "Supervisor de patio",
+    badge: "Trazabilidad",
+    image:
+      "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=320&q=80&auto=format&fit=crop",
+  },
+  {
+    quote:
+      "Nos habían recomendado el taller por su precisión y honestidad. Después de la primera experiencia entendimos por qué tienen esa reputación.",
+    name: "Mariana Suárez",
+    role: "Gerente administrativa",
+    badge: "Recomendación",
+    image:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=320&q=80&auto=format&fit=crop",
+  },
+  {
+    quote:
+      "Cuando el vehículo es herramienta de trabajo, no podés dejarlo en cualquier lado. Acá sentís orden, criterio y un equipo que realmente responde.",
+    name: "Felipe Cardona",
+    role: "Propietario de camión",
+    badge: "Confianza",
+    image:
+      "https://images.unsplash.com/photo-1504593811423-6dd665756598?w=320&q=80&auto=format&fit=crop",
   },
 ] as const;
+
+const trustHighlights = [
+  {
+    icon: Clock3,
+    title: "Diagnóstico sin vueltas",
+    description: "Qué tiene el vehículo, qué sigue y cómo impacta en la operación.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Proceso respaldado",
+    description: "Cada intervención se explica con criterio técnico y trazabilidad.",
+  },
+  {
+    icon: Gauge,
+    title: "Resultado que se siente",
+    description: "La confianza aparece cuando el vehículo vuelve a responder en ruta.",
+  },
+] as const;
+
+const firstColumn = testimonials.slice(0, 3);
+const secondColumn = testimonials.slice(3, 6);
+const thirdColumn = testimonials.slice(6, 9);
 
 export function TrustSection({ id = "trust" }: TrustSectionProps) {
   const containerRef = useRef<HTMLElement>(null);
@@ -54,28 +144,27 @@ export function TrustSection({ id = "trust" }: TrustSectionProps) {
         },
       });
 
-      // ── Featured testimonial (large one) ──
-      gsap.from("[data-trust-featured]", {
-        x: -80,
+      // ── Left editorial block ──
+      gsap.from("[data-trust-intro]", {
+        x: -70,
         opacity: 0,
         duration: DURATION.slow,
         ease: EASE.smooth,
         scrollTrigger: {
-          trigger: "[data-trust-featured]",
+          trigger: "[data-trust-intro]",
           start: "top 80%",
           toggleActions: "play none none none",
         },
       });
 
-      // ── Side testimonials stagger ──
-      gsap.from("[data-trust-card]", {
+      // ── Moving columns panel ──
+      gsap.from("[data-trust-columns]", {
         x: 60,
         opacity: 0,
         duration: DURATION.reveal,
         ease: EASE.smooth,
-        stagger: 0.15,
         scrollTrigger: {
-          trigger: "[data-trust-grid]",
+          trigger: "[data-trust-columns]",
           start: "top 80%",
           toggleActions: "play none none none",
         },
@@ -97,8 +186,6 @@ export function TrustSection({ id = "trust" }: TrustSectionProps) {
     { scope: containerRef },
   );
 
-  const [featured, ...rest] = testimonials;
-
   return (
     <section
       id={id}
@@ -110,7 +197,7 @@ export function TrustSection({ id = "trust" }: TrustSectionProps) {
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 md:px-10">
         {/* ── Heading ── */}
-        <div data-trust-heading className="mb-16 md:mb-24">
+        <div data-trust-heading className="mx-auto mb-16 max-w-3xl md:mb-24">
           <p className="text-sm font-semibold uppercase tracking-[0.28em] text-gold">
             Testimonios
           </p>
@@ -118,84 +205,71 @@ export function TrustSection({ id = "trust" }: TrustSectionProps) {
             La confianza se construye{" "}
             <span className="text-gradient-gold">con resultados</span>
           </h2>
+          <p className="mt-6 max-w-2xl text-lg leading-8 text-text-muted">
+            Historias de taller, flota y carretera que hablan de lo mismo: criterio
+            técnico, tiempos claros y un servicio que devuelve tranquilidad cuando el
+            vehículo vuelve a la operación.
+          </p>
         </div>
 
-        {/* ── Editorial layout: featured (large) + side cards ── */}
-        <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:gap-12">
-          {/* Featured testimonial — large, editorial style */}
-          <div
-            data-trust-featured
-            className="group relative flex flex-col justify-between overflow-hidden rounded-[2.5rem] bg-charcoal p-10 shadow-2xl md:p-14"
-          >
-            {/* Decorative accent */}
-            <div className="absolute right-0 top-0 h-40 w-40 bg-[radial-gradient(circle,_rgba(201,169,110,0.15),_transparent_70%)]" />
+        <div data-trust-intro className="border-y border-charcoal/10 py-10 md:py-12">
+          <div className="flex flex-col gap-10 xl:flex-row xl:items-end xl:justify-between xl:gap-14">
+            <div className="max-w-3xl">
+              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-gold">
+                Lo que más repiten nuestros clientes
+              </p>
 
-            {/* Oversized quote mark */}
-            <div className="relative">
-              <span className="text-[8rem] font-bold leading-none text-gold/10 md:text-[10rem]">
-                &ldquo;
-              </span>
-              <p className="-mt-20 text-2xl leading-relaxed text-text-light md:text-3xl md:leading-snug">
-                {featured.quote}
+              <h3 className="mt-5 max-w-2xl text-3xl font-bold tracking-tight text-charcoal md:text-4xl lg:text-5xl">
+                Precisión técnica, tiempos claros y una entrega que se siente en la ruta.
+              </h3>
+
+              <p className="mt-5 max-w-2xl text-base leading-8 text-text-muted md:text-lg">
+                Cada caso cambia, pero el patrón se repite: diagnóstico fino,
+                comunicación transparente y una ejecución que se nota cuando el vehículo
+                vuelve a responder con seguridad, fuerza y precisión.
               </p>
             </div>
 
-            <div className="mt-10 flex items-center gap-4 border-t border-pure-white/10 pt-8">
-              {/* Avatar placeholder */}
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gold/15 text-xl font-bold text-gold">
-                {featured.author[0]}
-              </div>
-              <div>
-                <p className="text-base font-semibold text-pure-white">
-                  {featured.author}
-                </p>
-                <p className="text-sm text-silver-light/50">
-                  {featured.role}
-                </p>
-              </div>
+            <div className="grid gap-6 border-t border-charcoal/10 pt-6 sm:grid-cols-3 xl:max-w-3xl xl:flex-1 xl:pt-0 xl:border-t-0">
+              {trustHighlights.map(({ icon: Icon, title, description }) => (
+                <div key={title} className="space-y-3 xl:border-l xl:border-charcoal/10 xl:pl-5 xl:first:border-l-0 xl:first:pl-0">
+                  <Icon className="size-5 text-gold" aria-hidden="true" />
+                  <p className="text-sm font-semibold uppercase tracking-[0.16em] text-charcoal">
+                    {title}
+                  </p>
+                  <p className="text-sm leading-6 text-text-muted">
+                    {description}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
+        </div>
 
-          {/* Side testimonials — stacked */}
-          <div data-trust-grid className="flex flex-col gap-6">
-            {rest.map((testimonial) => (
-              <article
-                key={testimonial.author}
-                data-trust-card
-                className="group relative overflow-hidden rounded-[2rem] border border-charcoal/[0.06] bg-pure-white p-8 shadow-[0_24px_70px_-45px_rgba(45,45,45,0.15)] transition-shadow duration-300 hover:shadow-[0_24px_70px_-30px_rgba(201,169,110,0.2)] md:p-10"
-              >
-                {/* Accent on hover */}
-                <div className="absolute left-0 top-0 h-full w-[3px] bg-gradient-to-b from-gold to-gold-dark opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-
-                <span className="text-5xl font-bold leading-none text-gold/20">
-                  &ldquo;
-                </span>
-                <p className="-mt-2 text-lg leading-relaxed text-charcoal">
-                  {testimonial.quote}
-                </p>
-
-                <div className="mt-6 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gold/10 text-sm font-bold text-gold">
-                    {testimonial.author[0]}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-charcoal">
-                      {testimonial.author}
-                    </p>
-                    <p className="text-xs text-text-muted">
-                      {testimonial.role}
-                    </p>
-                  </div>
-                </div>
-              </article>
-            ))}
+        <div data-trust-columns className="relative mt-12 md:mt-14">
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,_rgba(201,169,110,0.08),_transparent_70%)]" />
+          <div className="overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]">
+            <div className="grid h-[28rem] gap-5 md:h-[34rem] md:grid-cols-2 xl:h-[38rem] xl:grid-cols-3">
+              <TestimonialsColumn testimonials={firstColumn} duration={21} />
+              <TestimonialsColumn
+                testimonials={secondColumn}
+                duration={24}
+                reverse
+                className="hidden md:block"
+              />
+              <TestimonialsColumn
+                testimonials={thirdColumn}
+                duration={20}
+                className="hidden xl:block"
+              />
+            </div>
           </div>
         </div>
 
         {/* ── CTA Block ── */}
         <div
           data-trust-cta
-          className="mt-20 flex flex-col items-center gap-5 rounded-[2rem] border border-gold/10 bg-[linear-gradient(135deg,_rgba(201,169,110,0.06),_transparent)] px-8 py-12 text-center md:mt-28 md:flex-row md:justify-between md:px-14 md:text-left"
+          className="mt-14 flex flex-col items-center gap-5 border-t border-charcoal/10 pt-8 text-center md:mt-16 md:flex-row md:justify-between md:text-left"
         >
           <div>
             <p className="text-2xl font-bold tracking-tight text-charcoal md:text-3xl">
@@ -210,7 +284,7 @@ export function TrustSection({ id = "trust" }: TrustSectionProps) {
             href="#contacto"
           >
             Agenda tu diagnóstico
-            <span>→</span>
+            <ArrowRight className="size-4" aria-hidden="true" />
           </a>
         </div>
       </div>
