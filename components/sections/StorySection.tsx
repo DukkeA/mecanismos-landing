@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import Image from "next/image";
 import { GearSVG } from "@/components/svg/GearSVG";
-import { prefersReducedMotion } from "@/lib/animations";
+import { isMobile, prefersReducedMotion } from "@/lib/animations";
 import { gsap, ScrollTrigger, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
 
 registerGSAPPlugins();
@@ -61,6 +61,9 @@ export function StorySection({ id = "historia" }: { id?: string }) {
       const getScrollDistance = () =>
         Math.max(0, track.scrollWidth - container.clientWidth);
 
+      const mobile = isMobile();
+      const getScrollBudget = () => getScrollDistance() * (mobile ? 1.35 : 1);
+
       // ── Horizontal scroll: pin container, scrub track left ──
       const horizontalTween = gsap.to(track, {
         x: () => -getScrollDistance(),
@@ -68,11 +71,12 @@ export function StorySection({ id = "historia" }: { id?: string }) {
         scrollTrigger: {
           trigger: container,
           pin: true,
-          scrub: 1,
+          scrub: mobile ? 0.3 : 1,
           start: "top top",
-          end: () => `+=${getScrollDistance()}`,
+          end: () => `+=${getScrollBudget()}`,
           anticipatePin: 1,
-          snap: 1 / (panels.length - 1),
+          snap: mobile ? undefined : 1 / (panels.length - 1),
+          pinSpacing: true,
           invalidateOnRefresh: true,
         },
       });

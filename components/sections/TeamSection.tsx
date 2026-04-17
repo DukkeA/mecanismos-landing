@@ -4,8 +4,8 @@ import { useCallback, useRef, useState, type RefObject } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { BrandCarousel } from "@/components/ui/BrandCarousel";
-import { prefersReducedMotion } from "@/lib/animations";
-import { gsap, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
+import { isMobile, prefersReducedMotion } from "@/lib/animations";
+import { gsap, ScrollTrigger, useGSAP, registerGSAPPlugins } from "@/lib/gsap-register";
 
 registerGSAPPlugins();
 
@@ -163,6 +163,8 @@ const TEAM_MEMBERS: readonly TeamMember[] = [
 
 const TEAM_STEPS = ["Fundador", "Fundadora", "Equipo interactivo"] as const;
 
+const MOBILE_TEAM_OPERATIVE_PANELS = [TEAM_MEMBERS.slice(2, 4), TEAM_MEMBERS.slice(4, 6)] as const;
+
 type TeamFlightRect = {
   top: number;
   left: number;
@@ -248,7 +250,7 @@ export function TeamSection({ id = "equipo", vehicleBrands }: TeamSectionProps) 
 
   useGSAP(
     () => {
-      if (prefersReducedMotion()) return;
+      if (prefersReducedMotion() || isMobile()) return;
 
       const stage = stageRef.current;
       if (!stage) return;
@@ -340,9 +342,13 @@ export function TeamSection({ id = "equipo", vehicleBrands }: TeamSectionProps) 
         }}
       />
 
+      <div className="relative z-20 md:hidden">
+        <MobileTeamNarrative />
+      </div>
+
       <div
         ref={stageRef}
-        className="relative min-h-[100svh] overflow-hidden motion-reduce:hidden"
+        className="relative hidden min-h-[100svh] overflow-hidden md:block motion-reduce:hidden"
       >
         <div className="pointer-events-none absolute inset-x-0 top-0 z-30 mx-auto flex w-full max-w-7xl flex-col gap-6 px-6 pt-8 md:flex-row md:items-start md:justify-between md:px-10 md:pt-10">
           <div className="max-w-xl">
@@ -467,7 +473,7 @@ export function TeamSection({ id = "equipo", vehicleBrands }: TeamSectionProps) 
         </article>
       </div>
 
-      <div className="relative z-20 hidden px-6 py-20 motion-reduce:block md:px-10 md:py-28">
+      <div className="relative z-20 hidden px-6 py-20 md:px-10 md:py-28 md:motion-reduce:block">
         <div className="mx-auto max-w-7xl space-y-10">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.28em] text-gold">
@@ -553,6 +559,192 @@ export function TeamSection({ id = "equipo", vehicleBrands }: TeamSectionProps) 
 }
 
 export default TeamSection;
+
+function MobileTeamNarrative() {
+  const operativeSectionRef = useRef<HTMLElement>(null);
+  const operativePinRef = useRef<HTMLDivElement>(null);
+  const operativeTrackRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      if (prefersReducedMotion() || !isMobile()) return;
+
+      const section = operativeSectionRef.current;
+      const pinTarget = operativePinRef.current;
+      const track = operativeTrackRef.current;
+      if (!section || !pinTarget || !track) return;
+
+      const panels = gsap.utils.toArray<HTMLElement>("[data-mobile-team-panel]");
+      if (panels.length === 0) return;
+
+      const getScrollDistance = () => Math.max(0, track.scrollWidth - pinTarget.clientWidth);
+      const getScrollBudget = () => getScrollDistance() * 1.35;
+
+      const horizontalTween = gsap.to(track, {
+        x: () => -getScrollDistance(),
+        ease: "none",
+        scrollTrigger: {
+          trigger: section,
+          pin: pinTarget,
+          scrub: 0.3,
+          start: "top top",
+          end: () => `+=${getScrollBudget()}`,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+        },
+      });
+
+      panels.forEach((panel, index) => {
+        const contents = panel.querySelectorAll("[data-mobile-team-content]");
+
+        if (index === 0) return;
+
+        contents.forEach((content) => {
+          gsap.from(content, {
+            x: 48,
+            opacity: 0,
+            scrollTrigger: {
+              trigger: panel,
+              containerAnimation: horizontalTween,
+              start: "left 85%",
+              end: "left 50%",
+              scrub: true,
+            },
+          });
+        });
+      });
+
+      ScrollTrigger.refresh();
+    },
+    { scope: operativeSectionRef },
+  );
+
+  return (
+    <div className="bg-charcoal text-pure-white">
+      {INTRO_SCENES.map((scene, index) => (
+        <article
+          key={scene.name}
+          className="relative min-h-[100svh] overflow-hidden border-b border-pure-white/10"
+        >
+          <Image
+            alt={scene.label}
+            className="object-cover"
+            fill
+            sizes="100vw"
+            src={scene.image}
+            priority={index === 0}
+          />
+          <div className={`absolute inset-0 ${scene.accentClass} opacity-85`} />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,_rgba(45,45,45,0.14)_0%,_rgba(45,45,45,0.2)_24%,_rgba(45,45,45,0.82)_100%)]" />
+
+          <div className="relative z-10 flex min-h-[100svh] flex-col justify-between px-6 pb-10 pt-8">
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-2">
+                <p className="text-sm font-semibold uppercase tracking-[0.28em] text-gold-light">
+                  Equipo
+                </p>
+                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-pure-white/70">
+                  {scene.role}
+                </p>
+              </div>
+
+              <span className="rounded-full border border-pure-white/12 bg-charcoal/34 px-3 py-1.5 text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-pure-white/68 backdrop-blur-md">
+                0{index + 1} / 04
+              </span>
+            </div>
+
+            <div className="space-y-5">
+              <div>
+                <h3 className="max-w-[12ch] text-4xl font-bold tracking-tight text-pure-white">
+                  {scene.name}
+                </h3>
+                <p className="mt-4 text-xl leading-snug text-pure-white/94">
+                  {scene.headline}
+                </p>
+              </div>
+
+              <p className="max-w-[34ch] text-base leading-relaxed text-silver-light/82">
+                {scene.description}
+              </p>
+
+              <div className="inline-flex rounded-full border border-pure-white/14 bg-charcoal/32 px-4 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-pure-white/78 backdrop-blur-md">
+                {scene.detail}
+              </div>
+            </div>
+          </div>
+        </article>
+      ))}
+
+      <section
+        ref={operativeSectionRef}
+        className="horizontal-scroll-container relative overflow-hidden bg-[linear-gradient(180deg,_rgba(45,45,45,1),_rgba(32,32,32,1))]"
+      >
+        <div ref={operativePinRef} className="relative min-h-[100svh] overflow-hidden">
+          <div ref={operativeTrackRef} className="horizontal-scroll-track">
+            {MOBILE_TEAM_OPERATIVE_PANELS.map((panel, index) => (
+              <article
+                key={`team-mobile-panel-${index + 1}`}
+                data-mobile-team-panel
+                className="horizontal-scroll-panel noise-overlay"
+              >
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,_rgba(201,169,110,0.18),_transparent_34%),radial-gradient(circle_at_78%_82%,_rgba(184,184,184,0.12),_transparent_30%),linear-gradient(180deg,_rgba(45,45,45,1),_rgba(32,32,32,1))]" />
+
+                <div className="relative z-10 flex h-full w-full flex-col px-6 pb-6 pt-8">
+                  <div data-mobile-team-content className="max-w-sm space-y-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.28em] text-gold-light">
+                      Equipo operativo
+                    </p>
+                    <h3 className="text-3xl font-bold tracking-tight text-pure-white">
+                      Dupla 0{index + 1}, una estación por avance.
+                    </h3>
+                    <div className="flex items-center justify-between text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-pure-white/56">
+                      <span>Panel 0{index + 1}</span>
+                      <span>0{index + 3} / 04</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 grid flex-1 grid-rows-2 gap-3">
+                    {panel.map((member) => (
+                      <div key={member.id} data-mobile-team-content>
+                        <MobileTeamVisualCard member={member} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function MobileTeamVisualCard({ member }: Readonly<{ member: TeamMember }>) {
+  return (
+    <div className="relative h-full overflow-hidden rounded-[1.7rem] border border-pure-white/10 bg-charcoal shadow-[0_24px_80px_-45px_rgba(0,0,0,0.45)]">
+      <Image
+        alt={member.label}
+        className="object-cover"
+        fill
+        sizes="100vw"
+        src={member.image}
+      />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,_rgba(45,45,45,0.12),_rgba(45,45,45,0.28)_36%,_rgba(45,45,45,0.82)_100%)]" />
+
+      <div className="absolute left-4 top-4 rounded-full border border-pure-white/12 bg-charcoal/38 px-3 py-1.5 text-[0.58rem] font-semibold uppercase tracking-[0.2em] text-pure-white/76 backdrop-blur-md">
+        {member.metric}
+      </div>
+
+      <div className="absolute inset-x-0 bottom-0 p-4">
+        <p className="text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-pure-white/84">
+          {member.name}
+        </p>
+        <p className="mt-2 text-sm leading-relaxed text-silver-light/72">{member.specialty}</p>
+      </div>
+    </div>
+  );
+}
 
 function TeamCollage({
   activeMemberId,

@@ -2,12 +2,12 @@
 
 import { FloatingDock } from '@/components/ui/floating-dock';
 import {
-  Github,
+  // Github,
   Home,
   Layers,
   RefreshCw,
   Terminal,
-  Twitter,
+  // Twitter,
 } from 'lucide-react';
 
 export default function FloatingDockDemo() {
@@ -50,20 +50,6 @@ export default function FloatingDockDemo() {
       title: 'Changelog',
       icon: (
         <RefreshCw className="h-full w-full text-neutral-500 dark:text-neutral-300" />
-      ),
-      href: '#',
-    },
-    {
-      title: 'Twitter',
-      icon: (
-        <Twitter className="h-full w-full text-neutral-500 dark:text-neutral-300" />
-      ),
-      href: '#',
-    },
-    {
-      title: 'GitHub',
-      icon: (
-        <Github className="h-full w-full text-neutral-500 dark:text-neutral-300" />
       ),
       href: '#',
     },
