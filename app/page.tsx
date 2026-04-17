@@ -1,6 +1,6 @@
 import { NavDock } from "@/components/ui/nav-dock";
 import { Footer } from "@/components/layout/Footer";
-import { BrandCarousel } from "@/components/ui/BrandCarousel";
+import { PartsBrandsFeatureSection } from "@/components/ui/stack-feature-section";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { StorySection } from "@/components/sections/StorySection";
 import { ServicesSection } from "@/components/sections/ServicesSection";
@@ -70,12 +70,7 @@ export default function Home() {
 
         <ServicesSection
           brandCarousel={
-            <>
-              <p className="mb-5 text-center text-xs font-semibold uppercase tracking-[0.3em] text-text-muted">
-                Marcas de repuestos con las que trabajamos
-              </p>
-              <BrandCarousel brands={PARTS_BRANDS} direction="left" speed="slow" />
-            </>
+            <PartsBrandsFeatureSection brands={PARTS_BRANDS} />
           }
         />
 
