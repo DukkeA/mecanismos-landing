@@ -289,9 +289,6 @@ export function TrustSection({ id = "trust" }: TrustSectionProps) {
           </a>
         </div>
       </div>
-
-      {/* Shaped transition to Contact section (charcoal) */}
-      <GearToothDivider fill="var(--color-charcoal)" />
     </section>
   );
 }
